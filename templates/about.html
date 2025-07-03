@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+    <title>About Us - SurakshaNetra</title>
+    <style>
+        htnl{
+            font-family: "Handjet", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+                "ELGR" 1,
+                "ELSH" 2;
+            height: 100vh;
+  
+        }
+        html, body {
+            height: 100%;
+            
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            background: radial-gradient(circle at top left, 
+                #5A639C, 
+                #7776B3 40%, 
+                #9B86BD 70%, 
+                #E2BBE9);
+            margin: 0;
+        }
+        .container {
+            flex: 1; /* This ensures the container takes up the available space */
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            border: 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .navbar-brand img {
+            height:100px ; 
+            width: auto;
+            margin-right: 10px;          
+         
+        }
+        nav{
+            background-color: #2c103f;
+            color: #ffffff;
+            padding: 5px 0; 
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+        }
+        nav{
+            z-index: 1000;
+            font-size: 1.5rem;
+        }
+        .card-header {
+            background-color: #9546c8;
+            border-radius: 15px 15px 0 0;
+            padding: 15px;
+        }
+        .card-title {
+            color: #ffffff;
+            font-size: 1.5rem;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .btn-primary {
+            background-color: #9546c8;
+            border: 0;
+        }
+        .btn-primary:hover {
+            background-color: #7f3eab;
+        }
+        .navbar-brand {
+            font-family: "Handjet", sans-serif;
+            font-weight: 600;
+            font-size: 3rem;
+        }
+        .navbar-brand img {
+            height: 100px;
+            width: auto;
+            margin-right: 10px;
+        }
+        .team-member img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+        }
+        .team-member {
+            margin-bottom: 30px;
+        }
+        footer {
+            background-color: #2c103f;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="static/LOGOS/SurakshaNetra-nen.png" alt="SurakshaNetra Logo">SurakshaNetra
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">About Us</h1>
+        </div>
+        <div class="card-body">
+            <h2>Our Mission</h2>
+            <p>At SurakshaNetra, our mission is to leverage cutting-edge technology to provide advanced solutions for digital security and deepfake detection. We are dedicated to staying ahead of emerging threats and delivering robust solutions that safeguard digital assets.</p>
+            
+            <h2>Meet the Team</h2>
+            <div class="row">
+                <!-- Team Member 1 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/Arijit.png" alt="Arijit Mondal">
+                    <h5>Arijit Mondal</h5>
+                    <p>Lead Developer/Team Lead</p>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/asmita.png" alt="Asmita Dey">
+                    <h5>Asmita Dey</h5>
+                    <p>Project Manager</p>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/angi.png" alt="Angiravo Saha">
+                    <h5>Angiravo Saha</h5>
+                    <p>Data Scientist</p>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Team Member 4 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/BB.png" alt="Bratyabandhu Bhattacharyya">
+                    <h5>Bratyabandhu Bhattacharyya</h5>
+                    <p>UX/UI Designer</p>
+                </div>
+                <!-- Team Member 5 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/ghosh.png" alt="Arijit Ghosh">
+                    <h5>Arijit Ghosh</h5>
+                    <p>Software Engineer</p>
+                </div>
+                <!-- Team Member 6 -->
+                <div class="col-md-4 text-center team-member">
+                    <img src="static/LOGOS/debjit.jpg" alt="Debjit Roy">
+                    <h5>Debjit Roy</h5>
+                    <p>Quality Assurance</p>
+                </div>
+            </div>
+            
+            <h2>About the Software</h2>
+            <p>Our software, SurakshaNetra, is designed to provide robust solutions for detecting and mitigating digital threats. With advanced algorithms and state-of-the-art technology, our platform ensures that digital assets are protected from emerging threats and vulnerabilities. The software offers comprehensive analysis, real-time detection, and user-friendly interfaces to make digital security accessible and effective.</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 SurakshaNetra <br> Connect with us: <a href="#" target="_blank">Twitter</a> | <a href="#" target="_blank">Instagram</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
