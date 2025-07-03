@@ -121,8 +121,8 @@ dmypy.json
 ehthumbs.db
 Thumbs.db
 
-# Video files (optional - uncomment if you don't want to include sample videos)
-# *.mp4
-# *.avi
-# *.mov
-# *.wmv
+# Video files (large files excluded for now)
+*.mp4
+*.avi
+*.mov
+*.wmv
