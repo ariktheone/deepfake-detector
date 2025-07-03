@@ -12,6 +12,12 @@ pip install -U pip wheel setuptools
 pip install -r requirements.txt
 ```
 
+## Important Notes
+
+- Large video files and model files have been excluded from this repository due to GitHub's file size limitations
+- You'll need to download the required model file: `shape_predictor_68_face_landmarks.dat` and place it in the `models/` directory
+- Add your own sample video files to the `data/` directory for testing
+
 ## Application
 
 - You can run the file named [main.py](main.py).
