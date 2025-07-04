@@ -1,205 +1,654 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - SurakshaNetra</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        htnl{
-            font-family: "Handjet", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
-            font-variation-settings:
-                "ELGR" 1,
-                "ELSH" 2;
-            height: 100vh;
-  
-        }
-        html, body {
-            height: 100%;
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
             
-            display: flex;
-            flex-direction: column;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        body {
-            background: radial-gradient(circle at top left, 
-                #5A639C, 
-                #7776B3 40%, 
-                #9B86BD 70%, 
-                #E2BBE9);
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            flex: 1; /* This ensures the container takes up the available space */
-            margin-top: 20px;
-            margin-bottom: 20px;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
         }
-        .card {
-            border: 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .navbar-brand img {
-            height:100px ; 
-            width: auto;
-            margin-right: 10px;          
-         
-        }
-        nav{
-            background-color: #2c103f;
-            color: #ffffff;
-            padding: 5px 0; 
-            width: 100%;
+
+        /* Header (same as index.html) */
+        .header {
             position: fixed;
-            bottom: 0;
-        }
-        nav{
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
             z-index: 1000;
-            font-size: 1.5rem;
+            transition: var(--transition);
         }
-        .card-header {
-            background-color: #9546c8;
-            border-radius: 15px 15px 0 0;
-            padding: 15px;
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
         }
-        .card-title {
-            color: #ffffff;
-            font-size: 1.5rem;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 24px;
+            transition: var(--transition);
         }
-        .card-body {
-            padding: 15px;
+
+        .logo:hover {
+            color: var(--primary-color);
+            transform: translateY(-1px);
         }
-        .btn-primary {
-            background-color: #9546c8;
-            border: 0;
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
         }
-        .btn-primary:hover {
-            background-color: #7f3eab;
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
         }
-        .navbar-brand {
-            font-family: "Handjet", sans-serif;
-            font-weight: 600;
-            font-size: 3rem;
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
         }
-        .navbar-brand img {
-            height: 100px;
-            width: auto;
-            margin-right: 10px;
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-100);
         }
-        .team-member img {
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
         }
-        .team-member {
-            margin-bottom: 30px;
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 60px 24px;
+            min-height: calc(100vh - 80px);
         }
-        footer {
-            background-color: #2c103f;
-            color: #ffffff;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: var(--white);
+            padding: 80px 0;
             text-align: center;
-            padding: 20px 0;
+            border-radius: var(--border-radius-xl);
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(18px, 3vw, 24px);
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 60px;
+        }
+
+        .section-card {
+            background: var(--white);
+            border-radius: var(--border-radius-xl);
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+        }
+
+        .section-content {
+            font-size: 16px;
+            color: var(--gray-700);
+            line-height: 1.8;
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 32px;
+        }
+
+        .team-member {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 32px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition-slow);
+        }
+
+        .team-member:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 4px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .team-member:hover .member-avatar {
+            border-color: var(--primary-color);
+        }
+
+        .member-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .member-role {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .member-description {
+            color: var(--gray-600);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Technology Stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .tech-item {
+            background: var(--gray-50);
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            border: 2px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .tech-item:hover {
+            border-color: var(--primary-color);
+            background: var(--white);
+            transform: translateY(-4px);
+        }
+
+        .tech-icon {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .tech-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .tech-description {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .footer-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            color: var(--gray-400);
+            margin-bottom: 24px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--gray-800);
+            border-radius: 50%;
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            border-top: 1px solid var(--gray-800);
+            padding-top: 24px;
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 16px;
+                border-top: 1px solid var(--gray-200);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .nav-menu.show {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-container {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .main-content {
+                margin-top: 64px;
+                padding: 32px 16px;
+            }
+
+            .section-card {
+                padding: 32px 24px;
+            }
+
+            .hero-section {
+                padding: 60px 24px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 16px;
+            }
         }
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img src="static/LOGOS/SurakshaNetra-nen.png" alt="SurakshaNetra Logo">SurakshaNetra
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <img src="{{ url_for('static', filename='LOGOS/SurakshaNetra-nen.png') }}" alt="SurakshaNetra Logo">
+                <span>SurakshaNetra</span>
+            </a>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="nav-link active">About</a></li>
+                <li><a href="#technology" class="nav-link">Technology</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
-        </div>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h1 class="card-title">About Us</h1>
-        </div>
-        <div class="card-body">
-            <h2>Our Mission</h2>
-            <p>At SurakshaNetra, our mission is to leverage cutting-edge technology to provide advanced solutions for digital security and deepfake detection. We are dedicated to staying ahead of emerging threats and delivering robust solutions that safeguard digital assets.</p>
             
-            <h2>Meet the Team</h2>
-            <div class="row">
-                <!-- Team Member 1 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/Arijit.png" alt="Arijit Mondal">
-                    <h5>Arijit Mondal</h5>
-                    <p>Lead Developer/Team Lead</p>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h1 class="hero-title">About SurakshaNetra</h1>
+                <p class="hero-subtitle">
+                    Pioneering the future of digital security through advanced AI-powered deepfake detection technology
+                </p>
+            </section>
+
+            <!-- Mission Section -->
+            <section class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        Our Mission
+                    </h2>
+                    <div class="section-content">
+                        <p>At SurakshaNetra, our mission is to safeguard digital authenticity in an era of sophisticated deepfake technology. We leverage cutting-edge artificial intelligence and machine learning algorithms to provide robust, reliable, and real-time detection of manipulated media content.</p>
+                        <br>
+                        <p>Our commitment extends beyond technology – we're dedicated to empowering individuals, organizations, and institutions with the tools they need to maintain trust and integrity in digital communications.</p>
+                    </div>
                 </div>
-                <!-- Team Member 2 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/asmita.png" alt="Asmita Dey">
-                    <h5>Asmita Dey</h5>
-                    <p>Project Manager</p>
+            </section>
+
+            <!-- Team Section -->
+            <section class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        Our Team
+                    </h2>
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/Arijit.png') }}" alt="Arijit Mondal" class="member-avatar">
+                            <h3 class="member-name">Arijit Mondal</h3>
+                            <p class="member-role">Lead Developer & Team Lead</p>
+                            <p class="member-description">Expert in machine learning and computer vision with 5+ years of experience in AI development and neural network architectures.</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/asmita.png') }}" alt="Asmita Dey" class="member-avatar">
+                            <h3 class="member-name">Asmita Dey</h3>
+                            <p class="member-role">Project Manager</p>
+                            <p class="member-description">Seasoned project manager with expertise in agile methodologies and cross-functional team coordination in AI projects.</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/angi.png') }}" alt="Angiravo Saha" class="member-avatar">
+                            <h3 class="member-name">Angiravo Saha</h3>
+                            <p class="member-role">Data Scientist</p>
+                            <p class="member-description">Specialized in deep learning and data analysis with focus on video processing and anomaly detection algorithms.</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/BB.png') }}" alt="Bratyabandhu Bhattacharyya" class="member-avatar">
+                            <h3 class="member-name">Bratyabandhu Bhattacharyya</h3>
+                            <p class="member-role">UX/UI Designer</p>
+                            <p class="member-description">Creative designer focused on creating intuitive and accessible interfaces for complex AI technologies.</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/ghosh.png') }}" alt="Arijit Ghosh" class="member-avatar">
+                            <h3 class="member-name">Arijit Ghosh</h3>
+                            <p class="member-role">Software Engineer</p>
+                            <p class="member-description">Full-stack developer with expertise in scalable architecture and performance optimization for AI applications.</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="{{ url_for('static', filename='LOGOS/debjit.jpg') }}" alt="Debjit Roy" class="member-avatar">
+                            <h3 class="member-name">Debjit Roy</h3>
+                            <p class="member-role">Quality Assurance</p>
+                            <p class="member-description">QA specialist ensuring reliability and accuracy of AI models through comprehensive testing and validation processes.</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- Team Member 3 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/angi.png" alt="Angiravo Saha">
-                    <h5>Angiravo Saha</h5>
-                    <p>Data Scientist</p>
+            </section>
+
+            <!-- Technology Section -->
+            <section class="content-section" id="technology">
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        Technology Stack
+                    </h2>
+                    <div class="section-content">
+                        <p>Our platform leverages state-of-the-art technologies and frameworks to deliver accurate and efficient deepfake detection capabilities.</p>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-item">
+                            <i class="fab fa-python tech-icon"></i>
+                            <div class="tech-name">Python & AI</div>
+                            <div class="tech-description">Advanced machine learning with TensorFlow, PyTorch, and scikit-learn</div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-brain tech-icon"></i>
+                            <div class="tech-name">Deep Learning</div>
+                            <div class="tech-description">Convolutional neural networks and transformer architectures</div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-eye tech-icon"></i>
+                            <div class="tech-name">Computer Vision</div>
+                            <div class="tech-description">OpenCV, MediaPipe for advanced video analysis</div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-server tech-icon"></i>
+                            <div class="tech-name">Backend</div>
+                            <div class="tech-description">Flask, REST APIs, and cloud infrastructure</div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-database tech-icon"></i>
+                            <div class="tech-name">Data Processing</div>
+                            <div class="tech-description">NumPy, Pandas for efficient data manipulation</div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-shield-alt tech-icon"></i>
+                            <div class="tech-name">Security</div>
+                            <div class="tech-description">End-to-end encryption and secure processing pipelines</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <!-- Team Member 4 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/BB.png" alt="Bratyabandhu Bhattacharyya">
-                    <h5>Bratyabandhu Bhattacharyya</h5>
-                    <p>UX/UI Designer</p>
+            </section>
+
+            <!-- About Software Section -->
+            <section class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        About SurakshaNetra Platform
+                    </h2>
+                    <div class="section-content">
+                        <p>SurakshaNetra represents a breakthrough in deepfake detection technology, combining multiple AI models and advanced computer vision techniques to provide comprehensive analysis of video content.</p>
+                        <br>
+                        <p><strong>Key Features:</strong></p>
+                        <ul style="margin-top: 16px; padding-left: 20px;">
+                            <li>Multi-model ensemble detection for enhanced accuracy</li>
+                            <li>Real-time video processing and analysis</li>
+                            <li>Advanced facial landmark and expression analysis</li>
+                            <li>Temporal consistency validation across video frames</li>
+                            <li>Industry-leading false positive reduction</li>
+                            <li>Comprehensive reporting and visualization</li>
+                            <li>Scalable cloud-based architecture</li>
+                        </ul>
+                        <br>
+                        <p>Our platform is designed to be accessible to both technical and non-technical users, providing detailed insights while maintaining an intuitive interface that makes digital security accessible to everyone.</p>
+                    </div>
                 </div>
-                <!-- Team Member 5 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/ghosh.png" alt="Arijit Ghosh">
-                    <h5>Arijit Ghosh</h5>
-                    <p>Software Engineer</p>
-                </div>
-                <!-- Team Member 6 -->
-                <div class="col-md-4 text-center team-member">
-                    <img src="static/LOGOS/debjit.jpg" alt="Debjit Roy">
-                    <h5>Debjit Roy</h5>
-                    <p>Quality Assurance</p>
-                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <h3 class="footer-title">SurakshaNetra</h3>
+            <p class="footer-text">Protecting digital authenticity through advanced AI technology</p>
+            
+            <div class="social-links">
+                <a href="#" class="social-link" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-link" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="#" class="social-link" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="social-link" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
             </div>
             
-            <h2>About the Software</h2>
-            <p>Our software, SurakshaNetra, is designed to provide robust solutions for detecting and mitigating digital threats. With advanced algorithms and state-of-the-art technology, our platform ensures that digital assets are protected from emerging threats and vulnerabilities. The software offers comprehensive analysis, real-time detection, and user-friendly interfaces to make digital security accessible and effective.</p>
+            <div class="copyright">
+                <p>&copy; 2024 SurakshaNetra. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
         </div>
-    </div>
-</div>
+    </footer>
 
-<footer>
-    <p>&copy; 2024 SurakshaNetra <br> Connect with us: <a href="#" target="_blank">Twitter</a> | <a href="#" target="_blank">Instagram</a></p>
-</footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
 
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

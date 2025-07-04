@@ -5,8 +5,12 @@ Application that detects the originality of video files with artificial intellig
 ## Setup Environment
 
 ```bash
-# Make sure your PIP is up to date
-pip install -U pip wheel setuptools
+# Create a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Make sure your PIP, setuptools, and wheel are up to date
+pip install --upgrade pip setuptools wheel
 
 # Install required dependencies
 pip install -r requirements.txt
@@ -17,6 +21,7 @@ pip install -r requirements.txt
 - Large video files and model files have been excluded from this repository due to GitHub's file size limitations
 - You'll need to download the required model file: `shape_predictor_68_face_landmarks.dat` and place it in the `models/` directory
 - Add your own sample video files to the `data/` directory for testing
+- **Python 3.8-3.11 recommended** (Python 3.12 may have compatibility issues with some packages)
 
 ## Application
 

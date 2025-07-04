@@ -2,233 +2,1264 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
-    <title>SurakshaNetra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results - SurakshaNetra</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        htnl{
-            font-family: "Handjet", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
-            font-variation-settings:
-                "ELGR" 1,
-                "ELSH" 2;
-            height: 100vh;
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: radial-gradient(circle at top left, 
-                #5A639C, 
-                #7776B3 40%, 
-                #9B86BD 70%, 
-                #E2BBE9);
-            height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Professional Header (same as index/about) */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 24px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-100);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--gray-100);
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 40px 24px;
+            min-height: calc(100vh - 80px);
         }
 
         .container {
-            margin-top: 20px;
-            margin-bottom: 20px; 
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .card {
-            border: 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 150px;
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 32px 0;
         }
 
-        .card-header {
-            background-color: #9546c8;
-            border-radius: 15px 15px 0 0;
-            padding: 15px; 
+        .page-title {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 12px;
         }
 
-        .card-title {
-            color: #ffffff;
-            font-size: 1.5rem; 
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--gray-600);
+            font-weight: 400;
         }
 
-        .card-body {
-            padding: 15px; 
+        /* Risk Assessment Banner */
+        .risk-banner {
+            background: linear-gradient(135deg, 
+                {% if video_info.risk_level.level == 'HIGH' %}
+                    var(--danger-color) 0%, #dc2626 100%
+                {% elif video_info.risk_level.level == 'MODERATE' %}
+                    var(--warning-color) 0%, #d97706 100%
+                {% elif video_info.risk_level.level == 'LOW' %}
+                    var(--accent-color) 0%, #0891b2 100%
+                {% else %}
+                    var(--success-color) 0%, #059669 100%
+                {% endif %}
+            );
+            color: var(--white);
+            border-radius: var(--border-radius-xl);
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .risk-score {
+            font-size: clamp(48px, 8vw, 72px);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-level {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 600;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-description {
+            font-size: 16px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .consensus-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--border-radius-lg);
+            padding: 12px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Statistics Cards */
+        .stats-section {
+            margin-bottom: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            text-align: center;
+            transition: var(--transition-slow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Video Comparison Section */
+        .video-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 16px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition-slow);
+        }
+
+        .video-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .video-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-container {
+            position: relative;
+            background: var(--gray-900);
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--gray-900);
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(8px);
+        }
+
+        .video-info {
+            padding: 20px 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 14px;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+
+        /* Detection Results Grid */
+        .detectors-section {
+            margin-bottom: 32px;
+        }
+
+        .detectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .detector-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition-slow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detector-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .detector-card.advanced_unified::before { background: var(--danger-color); }
+        .detector-card.unified::before { background: var(--warning-color); }
+        .detector-card.safe::before { background: var(--success-color); }
+
+        .detector-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .detector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .detector-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detector-status {
+            padding: 4px 12px;
+            border-radius: var(--border-radius);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .score-high { 
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+        }
+        .score-medium { 
+            background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+        }
+        .score-low { 
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+        }
+
+        .score-label {
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detector-details {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 14px;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--gray-900);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-bottom: 32px;
+        }
+
+        .features-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            padding: 16px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .feature-active {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: var(--white);
+            border-color: var(--success-color);
+        }
+
+        .feature-inactive {
+            background: var(--gray-50);
+            color: var(--gray-500);
+            border-color: var(--gray-200);
+        }
+
+        .feature-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .feature-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .actions-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .actions-grid {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-primary {
-            background-color: #9546c8;
-            border: 0;
-        }
-        .btn-primary:hover {
-            background-color: #7f3eab;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            box-shadow: var(--shadow);
         }
 
-        
-        
-        .video-frame {
-            max-width: 100%; 
-            height: auto;
-        }
-        .info-card {
-            margin-top: 20px;
-        }
-        .info-card,
-        .detection-label {
-            margin-left: 100px;
+        .btn-secondary {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
         }
 
-        .progress-container {
-            margin-left: 145px;
-            margin-bottom: 20px;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
-        .navbar-brand  {
-            font-family: "Handjet", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 600;
-            font-style: normal;
-            font-variation-settings:
-                "ELGR" 1,
-                "ELSH" 2;
-            font-size: 3rem;
+
+        /* Error States */
+        .video-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--gray-50);
+            color: var(--gray-500);
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--gray-300);
         }
-        nav{
-            background-color: #2c103f;
-            color: #ffffff;
-            padding: 5px 0; 
-            width: 100%;
-            position: fixed;
-            bottom: 0;
+
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--gray-400);
         }
-        footer {
-            background-color: #2c103f;
-            color: #ffffff;
-            padding: 5px 0; 
-            width: 100%;            
-            bottom: 0;
-            position: fixed;
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .navbar-brand img {
-            height: 100px; /* Adjust size as needed */
-            width: auto;
-            margin-right: 10px; /* Space between logo and text */
+
+        /* Footer */
+        .footer {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 32px 0;
+            text-align: center;
+            margin-top: 60px;
         }
-        nav{
-            z-index: 1000;
-            font-size: 1.5rem;
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
-    </style>
+
+        .footer-text {
+            color: var(--gray-400);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 12px;
+        }
+
+        .footer-link {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 16px;
+                border-top: 1px solid var(--gray-200);
+                box-shadow: var(--shadow-lg);
+                border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+            }
+
+            .nav-menu.show {
+                display: flex;
+                animation: fadeIn 0.3s ease;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-container {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .main-content {
+                margin-top: 64px;
+                padding: 24px 16px;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detectors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .actions-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .risk-score {
+                font-size: 48px;
+            }
+
+            .risk-level {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .risk-banner {
+                padding: 24px 16px;
+            }
+
+            .video-card,
+            .detector-card,
+            .features-card {
+                margin: 0 -8px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .animate-slide {
+            animation: slideIn 0.6s ease forwards;
+        }
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark ">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img src="static\LOGOS\SurakshaNetra-nen.png" alt="SurakshaNetra Logo">SurakshaNetra</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
+    <!-- Professional Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <img src="{{ url_for('static', filename='LOGOS/SurakshaNetra-nen.png') }}" alt="SurakshaNetra Logo">
+                <span>SurakshaNetra</span>
+            </a>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="nav-link">About</a></li>
+                <li><a href="#results" class="nav-link active">Results</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
-        </div>
-    </div>
-</nav>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h1 class="card-title">Deepfake Detection Result</h1>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <!-- Video frame -->
-                <div class="col-md-8">
-                    <video controls class="video-frame">
-                        <source src="{{ video_url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header animate-in">
+                <h1 class="page-title">Detection Analysis Results</h1>
+                <p class="page-subtitle">Comprehensive AI-powered deepfake detection analysis</p>
+            </div>
 
-                <!-- Video Information -->
-                <div class="col-md-4">
-                    <div class="info-card">
-                        <h5>Video Information:</h5>
-                        <br>
-                        <p><strong style="color: #034f84;">Name:</strong> {{ video_info['name'] }}</p>
-                        <p><strong style="color: #034f84;">Size:</strong> {{ video_info['size'] }}</p>
-                        <p><strong style="color: #034f84;">User:</strong> {{ video_info['user'] }}</p>
-                        <p><strong style="color: #034f84;">Date:</strong> {{ video_info['source'] }}</p>
-
-                    </div>
-
-                    <br>
-                    <br>
-
-                    <!-- Deepfake Detection Rate Label -->
-                    <div class="detection-label">
-                        <h5 class="bold-text">Deepfake Detection Rate:</h5>
-                    </div>
-
-                    <br>
-                    
-                    <!-- Yuvarlak İlerleme Çubuğu -->
-                    <div class="progress-container">
-                        <svg class="circle-progress" width="150" height="150" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Yuvarlak Çerçeve -->
-                            <circle class="progress-circle" cx="75" cy="75" r="70" fill="none" stroke="#ccc" stroke-width="8"></circle>
-                            
-                            <!-- İlerleme Çubuğu -->
-                            <circle class="progress-bar" cx="75" cy="75" r="70" fill="none" stroke="#4CAF50" stroke-width="8" stroke-dasharray="0 440"></circle>
-                            
-                            <!-- Yüzde Etiketi -->
-                            <text class="progress-label" x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24" fill="#333"></text>
-                        </svg>
-                    </div>
-
-                    <!-- JavaScript ile değeri al -->
-                    <script>
-                        var progressValue = parseFloat("{{ video_info['per'] }}");
-                        var totalValue = 100; // Yüzde cinsinden tam değer
-
-                        // İlerleme çubuğunu güncelle
-                        document.querySelector(".progress-bar").style.strokeDasharray = progressValue + " " + totalValue;
-
-                        // Yüzde etiketini güncelle
-                        document.querySelector(".progress-label").textContent = Math.round((progressValue / totalValue) * 100) + "%";
-                    </script>
-                
+            <!-- Risk Assessment Banner -->
+            <div class="risk-banner animate-in">
+                <div class="risk-score">{{ "%.1f"|format(video_info.deepfake_percentage) }}%</div>
+                <div class="risk-level">{{ video_info.risk_level.level }} RISK DETECTED</div>
+                <div class="risk-description">{{ video_info.risk_level.description }}</div>
+                <div class="consensus-info">
+                    <i class="fas fa-chart-line"></i>
+                    Consensus: {{ video_info.analysis_summary.consensus_level.title() }} • 
+                    Success Rate: {{ "%.1f"|format(video_info.summary_stats.success_rate) }}%
                 </div>
             </div>
+
+            <!-- Statistics Overview -->
+            <section class="stats-section animate-slide">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ video_info.summary_stats.successful_detectors }}/{{ video_info.summary_stats.total_detectors }}</div>
+                        <div class="stat-label">Detectors Successful</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ video_info.advanced_features_count }}/{{ video_info.total_features }}</div>
+                        <div class="stat-label">AI Features Used</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ "%.1f"|format(video_info.features_percentage) }}%</div>
+                        <div class="stat-label">Feature Coverage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ video_info.size }}</div>
+                        <div class="stat-label">Video Size</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Video Comparison -->
+            <section class="video-section" id="results">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    Video Analysis Comparison
+                </h2>
+                
+                <div class="video-grid">
+                    <!-- Original Video -->
+                    <div class="video-card">
+                        <div class="video-header">
+                            <h3 class="video-title">
+                                <i class="fas fa-upload"></i>
+                                Original Uploaded Video
+                            </h3>
+                        </div>
+                        <div class="video-container">
+                            {% if video_info.videos_exist.original %}
+                                <video class="video-player" controls preload="metadata">
+                                    <source src="{{ video_info.original_video_url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-overlay">Original</div>
+                            {% else %}
+                                <div class="video-error">
+                                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                                    <div><strong>Video Unavailable</strong></div>
+                                    <div>Original video file not accessible</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="video-info">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Filename</span>
+                                    <span class="info-value">{{ video_info.name }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">File Size</span>
+                                    <span class="info-value">{{ video_info.size }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Uploaded</span>
+                                    <span class="info-value">{{ video_info.source }}</span>
+                                </div>
+                                {% if 'original' in video_info.video_file_info %}
+                                <div class="info-item">
+                                    <span class="info-label">Status</span>
+                                    <span class="info-value">{{ video_info.video_file_info.original.size_mb }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Analysis Result -->
+                    <div class="video-card">
+                        <div class="video-header">
+                            <h3 class="video-title">
+                                <i class="fas fa-robot"></i>
+                                AI Analysis Result
+                            </h3>
+                        </div>
+                        <div class="video-container">
+                            {% set best_detector = 'advanced_unified' if video_info.processed_videos.advanced_unified.success 
+                                                  else 'unified' if video_info.processed_videos.unified.success 
+                                                  else 'safe' %}
+                            {% if video_info.videos_exist[best_detector] %}
+                                <video class="video-player" controls preload="metadata">
+                                    <source src="{{ video_info.processed_videos[best_detector].url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-overlay">
+                                    {{ best_detector.replace('_', ' ').title() }} Analysis
+                                </div>
+                            {% else %}
+                                <div class="video-error">
+                                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                                    <div><strong>Analysis Unavailable</strong></div>
+                                    <div>Processed video file not accessible</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="video-info">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Detection Method</span>
+                                    <span class="info-value">{{ best_detector.replace('_', ' ').title() }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Confidence Score</span>
+                                    <span class="info-value">{{ "%.1f"|format(video_info.processed_videos[best_detector].score) }}%</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Processing Type</span>
+                                    <span class="info-value">{{ video_info.detection_method }}</span>
+                                </div>
+                                {% if best_detector in video_info.video_file_info %}
+                                <div class="info-item">
+                                    <span class="info-label">Output Size</span>
+                                    <span class="info-value">{{ video_info.video_file_info[best_detector].size_mb }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Individual Detector Results -->
+            <section class="detectors-section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    Individual Detector Analysis
+                </h2>
+                
+                <div class="detectors-grid">
+                    {% for detector_name, detector_data in video_info.analysis_summary.detector_results.items() %}
+                    <div class="detector-card {{ detector_name }}">
+                        <div class="detector-header">
+                            <div class="detector-name">
+                                <i class="fas fa-microchip"></i>
+                                {{ detector_name.replace('_', ' ').title() }} Detector
+                            </div>
+                            <div class="detector-status {{ 'status-success' if detector_data.success else 'status-failed' }}">
+                                {{ 'Success' if detector_data.success else 'Failed' }}
+                            </div>
+                        </div>
+                        
+                        {% if detector_data.success %}
+                        <div class="score-display">
+                            {% set score = detector_data.score %}
+                            <div class="score-circle {{ 'score-high' if score > 60 else 'score-medium' if score > 30 else 'score-low' }}">
+                                {{ "%.0f"|format(score) }}%
+                            </div>
+                            <div class="score-label">Deepfake Probability</div>
+                        </div>
+                        
+                        <div class="detector-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Execution Time</span>
+                                <span class="detail-value">{{ "%.1f"|format(detector_data.execution_time) }}s</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Confidence Level</span>
+                                <span class="detail-value">{{ "%.2f"|format(detector_data.confidence) }}</span>
+                            </div>
+                            {% if detector_name in video_info.processed_videos %}
+                            <div class="detail-item">
+                                <span class="detail-label">Output File Size</span>
+                                <span class="detail-value">{{ video_info.processed_videos[detector_name].get('file_size', 'N/A') }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if video_info.videos_exist[detector_name] %}
+                        <a href="{{ video_info.processed_videos[detector_name].url }}" target="_blank" class="btn btn-secondary">
+                            <i class="fas fa-play"></i>
+                            View Analysis
+                        </a>
+                        {% endif %}
+                        
+                        {% else %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Detection Failed</strong><br>
+                                {{ detector_data.error or 'Unknown error occurred during analysis' }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Advanced Features Analysis -->
+            {% if video_info.analysis_summary.advanced_features %}
+            <section class="features-section">
+                <div class="features-card">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        Advanced AI Features Analysis
+                        <span style="font-size: 16px; font-weight: 400; color: var(--gray-600);">
+                            ({{ video_info.advanced_features_count }}/{{ video_info.total_features }} Active)
+                        </span>
+                    </h2>
+                    
+                    <div class="features-grid">
+                        {% for feature, active in video_info.analysis_summary.advanced_features.items() %}
+                        <div class="feature-item {{ 'feature-active' if active else 'feature-inactive' }}">
+                            <div class="feature-icon">
+                                <i class="fas {{ 'fa-check-circle' if active else 'fa-times-circle' }}"></i>
+                            </div>
+                            <div class="feature-name">{{ feature.replace('_', ' ').title() }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <section class="actions-section">
+                <div class="actions-grid">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-upload"></i>
+                        Analyze New Video
+                    </a>
+                    <a href="{{ url_for('debug_videos') }}" class="btn btn-secondary" target="_blank">
+                        <i class="fas fa-folder-open"></i>
+                        View All Files
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn btn-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        Learn More
+                    </a>
+                </div>
+            </section>
         </div>
-    </div>
-</div>
+    </main>
 
-<footer>
-    <div class="container text-center">
-        <p>&copy; 2024 SurakshaNetra <br> Connect with us: <a href="#" target="_blank">Twitter</a> | <a href="# target="_blank">Instagram</a></p>
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <p class="footer-text">
+                Powered by SurakshaNetra AI • Advanced Multi-Model Deepfake Detection Technology
+            </p>
+            <p class="footer-text">
+                Analysis completed using {{ video_info.advanced_features_count }}/{{ video_info.total_features }} advanced AI models 
+                with {{ "%.1f"|format(video_info.summary_stats.success_rate) }}% success rate
+            </p>
+            <div class="footer-links">
+                <span class="footer-text">
+                    Risk: <strong style="color: {{ video_info.risk_level.color }};">{{ video_info.risk_level.level }}</strong> • 
+                    Consensus: <strong>{{ video_info.analysis_summary.consensus_level.title() }}</strong> • 
+                    Recommendation: <strong>{{ video_info.analysis_summary.recommendation.replace('_', ' ').title() }}</strong>
+                </span>
+            </div>
+        </div>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function updateFileName() {
-        var fileName = document.getElementById("customFile").files[0].name;
-        document.getElementById("customFile").nextElementSibling.innerHTML = fileName;
-    }
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎬 Initializing SurakshaNetra Results Page...');
+            
+            // Header scroll effect
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
 
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+
+            // Enhanced video player setup
+            const videos = document.querySelectorAll('.video-player');
+            videos.forEach((video, index) => {
+                video.addEventListener('loadeddata', function() {
+                    console.log(`✅ Video ${index + 1} loaded successfully`);
+                });
+                
+                video.addEventListener('error', function(e) {
+                    console.error(`❌ Video ${index + 1} load error:`, e);
+                    const container = this.parentElement;
+                    container.innerHTML = `
+                        <div class="video-error">
+                            <i class="fas fa-exclamation-triangle error-icon"></i>
+                            <div><strong>Video Unavailable</strong></div>
+                            <div style="margin-top: 8px; font-size: 14px;">The video file could not be loaded. Please try refreshing the page.</div>
+                        </div>
+                    `;
+                });
+            });
+
+            // Display comprehensive analysis information
+            const videoInfo = {{ video_info|tojson }};
+            console.log('📊 Analysis Results Summary:');
+            console.log(`   Overall Score: ${videoInfo.deepfake_percentage.toFixed(1)}%`);
+            console.log(`   Risk Level: ${videoInfo.risk_level.level}`);
+            console.log(`   Consensus Quality: ${videoInfo.analysis_summary.consensus_level}`);
+            console.log(`   Advanced Features: ${videoInfo.advanced_features_count}/${videoInfo.total_features}`);
+            console.log(`   Success Rate: ${videoInfo.summary_stats.success_rate.toFixed(1)}%`);
+
+            // Animate elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements for animation
+            document.querySelectorAll('.detector-card, .video-card, .stat-card').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            console.log('✅ SurakshaNetra Results Page initialized successfully');
+        });
+    </script>
 </body>
 </html>

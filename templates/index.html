@@ -2,159 +2,867 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
-    <title>SurakshaNetra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurakshaNetra - AI-Powered Deepfake Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        htnl{
-            font-family: "Handjet", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
-            font-variation-settings:p
-                "ELGR" 1,
-                "ELSH" 2;
-            height: 100vh;
-  
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --white: #ffffff;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: radial-gradient(circle at top left, 
-                #5A639C, 
-                #7776B3 40%, 
-                #9B86BD 70%, 
-                #E2BBE9);
-            height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+            line-height: 1.6;
         }
-        .container {
-            margin-top: 20px; 
-            margin-bottom: 20px; 
-        }
-        .card {
-            border: 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background-color: #9546c8;
-            border-radius: 15px 15px 0 0;
-            padding: 15px; 
-        }
-        .card-title {
-            color: #ffffff;
-            font-size: 1.5rem; 
-        }
-        .card-body {
-            padding: 15px; 
-        }
-        .btn-primary {
-            background-color: #9546c8;
-            border: 0;
-        }
-        .btn-primary:hover {
-            background-color: #7f3eab;
-        }
-        .navbar-brand  {
-            font-family: "Handjet", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 600;
-            font-style: normal;
-            font-variation-settings:
-                "ELGR" 1,
-                "ELSH" 2;
-            font-size: 3rem;
-        }
-        nav{
-            background-color: #2c103f;
-            color: #ffffff;
-            padding: 5px 0; 
-            width: 100%;
+
+        /* Professional Header */
+        .header {
             position: fixed;
-            bottom: 0;
-        }
-        footer {
-            background-color: #2c103f;
-            color: #ffffff;
-            padding: 5px 0; 
-            width: 100%;            
-            bottom: 0;
-            position: fixed;
-        }
-        .navbar-brand img {
-            height:100px ; 
-            width: auto;
-            margin-right: 10px;          
-         
-        }
-        nav{
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
             z-index: 1000;
-            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 24px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-100);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--gray-100);
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 60px 24px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .hero-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 3vw, 20px);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .hero-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Upload Card */
+        .upload-card {
+            background: var(--white);
+            border-radius: var(--border-radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition-slow);
+        }
+
+        .upload-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .upload-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+
+        /* File Upload */
+        .file-upload-wrapper {
+            margin-bottom: 32px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--border-radius-lg);
+            padding: 48px 24px;
+            text-align: center;
+            background: var(--gray-50);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            background-opacity: 0.05;
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            transform: scale(1.02);
+        }
+
+        .file-upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        .file-upload-area:hover .upload-icon {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .supported-formats {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .format-tag {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .file-info {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .file-info.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .file-size {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: var(--border-radius-lg);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        .btn-icon {
+            font-size: 18px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-top: 48px;
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-xl);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .features-title {
+            text-align: center;
+            color: var(--white);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-item {
+            text-align: center;
+            color: var(--white);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-dismiss {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .alert-dismiss:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 16px;
+                border-top: 1px solid var(--gray-200);
+                box-shadow: var(--shadow-lg);
+                border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+            }
+
+            .nav-menu.show {
+                display: flex;
+                animation: fadeIn 0.3s ease;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-container {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .main-content {
+                margin-top: 64px;
+                padding: 32px 16px;
+            }
+
+            .upload-card {
+                padding: 24px;
+            }
+
+            .file-upload-area {
+                padding: 32px 16px;
+            }
+
+            .features-section {
+                padding: 24px;
+                margin-top: 32px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .upload-card {
+                padding: 20px;
+            }
+
+            .upload-title {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark ">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img src="static\LOGOS\SurakshaNetra-nen.png" alt="SurakshaNetra Logo">SurakshaNetra</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
+    <!-- Professional Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <img src="{{ url_for('static', filename='LOGOS/SurakshaNetra-nen.png') }}" alt="SurakshaNetra Logo">
+                <span>SurakshaNetra</span>
+            </a>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="{{ url_for('index') }}" class="nav-link active">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="nav-link">About</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
-        </div>
-    </div>
-</nav>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h1 class="card-title">Deepfake Detection</h1>
-        </div>
-        <div class="card-body">
-            <form action="/upload" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="customFile" class="form-label">Choose file</label>
-                    <input type="file" class="form-control" id="customFile" name="file" onchange="updateFileName()">
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-dismiss" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h1 class="hero-title">AI-Powered Deepfake Detection</h1>
+                <p class="hero-subtitle">Advanced Machine Learning Technology</p>
+                <p class="hero-description">
+                    Upload your video files and let our sophisticated AI algorithms analyze and detect potential deepfake content with industry-leading accuracy and reliability.
+                </p>
+            </section>
+
+            <!-- Upload Card -->
+            <div class="upload-card">
+                <div class="upload-header">
+                    <h2 class="upload-title">Upload Video for Analysis</h2>
+                    <p class="upload-subtitle">Drag and drop your video file or click to browse</p>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Upload</button>
-            </form>
+
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div class="file-upload-wrapper">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" 
+                                   name="file" 
+                                   id="fileInput" 
+                                   class="file-upload-input" 
+                                   accept=".mp4,.avi,.mov,.mkv,.webm" 
+                                   required>
+                            
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <div class="upload-text">Choose Video File</div>
+                                <div class="upload-subtext">or drag and drop it here</div>
+                                
+                                <div class="supported-formats">
+                                    <span class="format-tag">MP4</span>
+                                    <span class="format-tag">AVI</span>
+                                    <span class="format-tag">MOV</span>
+                                    <span class="format-tag">MKV</span>
+                                    <span class="format-tag">WEBM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="file-info" id="fileInfo" style="display: none;"></div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                        <i class="fas fa-search btn-icon"></i>
+                        <span class="btn-text">Analyze Video</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Features Section -->
+            <section class="features-section" id="features">
+                <h3 class="features-title">Advanced Detection Capabilities</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-brain feature-icon"></i>
+                        <div class="feature-title">Neural Network Analysis</div>
+                        <div class="feature-description">Deep learning models trained on millions of video samples</div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-eye feature-icon"></i>
+                        <div class="feature-title">Facial Analysis</div>
+                        <div class="feature-description">Advanced facial landmark and expression pattern detection</div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-clock feature-icon"></i>
+                        <div class="feature-title">Real-time Processing</div>
+                        <div class="feature-description">Fast analysis with detailed frame-by-frame results</div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <div class="feature-title">High Accuracy</div>
+                        <div class="feature-description">Industry-leading detection rates with minimal false positives</div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
-</div>
+    </main>
 
-<footer>
-    <div class="container text-center">
-        <p>&copy; 2024 SurakshaNetra <br> Connect with us: <a href="#" target="_blank">Twitter</a> | <a href="# target="_blank">Instagram</a></p>
-    </div>
-</footer>
+    <script>
+        // Enhanced JavaScript functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInfo = document.getElementById('fileInfo');
+            const submitBtn = document.getElementById('submitBtn');
+            const uploadForm = document.getElementById('uploadForm');
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function updateFileName() {
-        var fileName = document.getElementById("customFile").files[0].name;
-        document.getElementById("customFile").nextElementSibling.innerHTML = fileName;
-    }
-</script>
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
 
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+
+            // File upload handling
+            fileInput.addEventListener('change', handleFileSelect);
+            fileUploadArea.addEventListener('click', () => fileInput.click());
+            
+            // Drag and drop functionality
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelect();
+                }
+            });
+
+            function handleFileSelect() {
+                const file = fileInput.files[0];
+                if (file) {
+                    const fileName = file.name;
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    
+                    // Validate file type
+                    const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/quicktime', 'video/x-msvideo', 'video/webm', 'video/x-matroska'];
+                    if (!allowedTypes.includes(file.type)) {
+                        showAlert('Please select a valid video file (MP4, AVI, MOV, MKV, WEBM)', 'error');
+                        resetFileInput();
+                        return;
+                    }
+
+                    // Validate file size (500MB limit)
+                    if (file.size > 500 * 1024 * 1024) {
+                        showAlert('File size must be less than 500MB', 'error');
+                        resetFileInput();
+                        return;
+                    }
+
+                    // Show file info
+                    fileInfo.innerHTML = `
+                        <div class="file-name">${fileName}</div>
+                        <div class="file-size">${fileSize} MB</div>
+                    `;
+                    fileInfo.style.display = 'block';
+                    fileInfo.classList.add('show');
+                    
+                    // Enable submit button
+                    submitBtn.disabled = false;
+                    
+                    // Update upload area
+                    const uploadContent = fileUploadArea.querySelector('.upload-content');
+                    uploadContent.innerHTML = `
+                        <i class="fas fa-check-circle upload-icon" style="color: var(--success-color);"></i>
+                        <div class="upload-text" style="color: var(--success-color);">File Selected</div>
+                        <div class="upload-subtext">Click to choose a different file</div>
+                    `;
+                }
+            }
+
+            function resetFileInput() {
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                submitBtn.disabled = true;
+                
+                // Reset upload area
+                const uploadContent = fileUploadArea.querySelector('.upload-content');
+                uploadContent.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <div class="upload-text">Choose Video File</div>
+                    <div class="upload-subtext">or drag and drop it here</div>
+                    <div class="supported-formats">
+                        <span class="format-tag">MP4</span>
+                        <span class="format-tag">AVI</span>
+                        <span class="format-tag">MOV</span>
+                        <span class="format-tag">MKV</span>
+                        <span class="format-tag">WEBM</span>
+                    </div>
+                `;
+            }
+
+            // Form submission
+            uploadForm.addEventListener('submit', function(e) {
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    showAlert('Please select a video file first', 'error');
+                    return;
+                }
+
+                // Show loading state
+                submitBtn.innerHTML = `
+                    <div class="spinner"></div>
+                    <span class="btn-text">Processing Video...</span>
+                `;
+                submitBtn.disabled = true;
+            });
+
+            function showAlert(message, type = 'warning') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.innerHTML = `
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+                    <span>${message}</span>
+                    <button type="button" class="alert-dismiss" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                const container = document.querySelector('.container');
+                container.insertBefore(alertDiv, container.firstChild);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentElement) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
