@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* UNIFIED STYLES */
         :root {
             --primary-color: #2563eb;
             --primary-dark: #1d4ed8;
@@ -18,6 +19,7 @@
             --dark-color: #0f172a;
             --light-color: #f8fafc;
             --white: #ffffff;
+            --gray-50: #f8fafc;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
@@ -54,7 +56,7 @@
             line-height: 1.6;
         }
 
-        /* Professional Header */
+        /* UNIFIED HEADER */
         .header {
             position: fixed;
             top: 0;
@@ -162,7 +164,7 @@
             color: var(--primary-color);
         }
 
-        /* Main Content */
+        /* PAGE SPECIFIC STYLES - Index Content */
         .main-content {
             margin-top: 80px;
             padding: 60px 24px;
@@ -237,7 +239,7 @@
             font-size: 16px;
         }
 
-        /* File Upload - FIXED VERSION */
+        /* File Upload Area */
         .file-upload-wrapper {
             margin-bottom: 32px;
         }
@@ -277,7 +279,7 @@
         }
 
         .upload-content {
-            pointer-events: none; /* Prevent double click events */
+            pointer-events: none;
             position: relative;
             z-index: 1;
         }
@@ -371,10 +373,6 @@
         .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
         }
 
         .submit-btn:disabled {
@@ -487,28 +485,67 @@
             background: rgba(0, 0, 0, 0.1);
         }
 
-        /* Animations */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* UNIFIED FOOTER */
+        .footer {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+            margin-top: 100px;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .footer-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
         }
 
-        /* Responsive Design */
+        .footer-text {
+            color: var(--gray-400);
+            margin-bottom: 32px;
+            font-size: 18px;
+        }
+
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .footer-social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--gray-800);
+            border-radius: 50%;
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 20px;
+        }
+
+        .footer-social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            border-top: 1px solid var(--gray-800);
+            padding-top: 32px;
+            color: var(--gray-500);
+            font-size: 16px;
+        }
+
+        /* UNIFIED RESPONSIVE DESIGN */
         @media (max-width: 768px) {
             .nav-menu {
                 display: none;
@@ -562,27 +599,30 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 28px;
-            }
+        /* Animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-            .hero-subtitle {
-                font-size: 16px;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-            .upload-card {
-                padding: 20px;
-            }
-
-            .upload-title {
-                font-size: 20px;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <!-- Professional Header -->
+    <!-- UNIFIED HEADER -->
     <header class="header" id="header">
         <nav class="nav-container">
             <a href="{{ url_for('index') }}" class="logo">
@@ -623,10 +663,11 @@
 
             <!-- Hero Section -->
             <section class="hero-section">
-                <h1 class="hero-title">AI-Powered Deepfake Detection</h1>
+                <h1 class="hero-title">Ultra-Lightweight AI Detection</h1>
                 <p class="hero-subtitle">Advanced Machine Learning Technology</p>
                 <p class="hero-description">
-                    Upload your video files and let our sophisticated AI algorithms analyze and detect potential deepfake content with industry-leading accuracy and reliability.
+                    Upload your video files for intelligent deepfake analysis with our optimized lightweight architecture. 
+                    Fast processing, accurate results, and automatic cleanup for optimal performance.
                 </p>
             </section>
 
@@ -667,43 +708,74 @@
                     
                     <button type="submit" class="submit-btn" id="submitBtn" disabled>
                         <i class="fas fa-search btn-icon"></i>
-                        <span class="btn-text">Analyze Video</span>
+                        <span class="btn-text">🚀 Analyze Video (Ultra-Fast)</span>
                     </button>
                 </form>
             </div>
 
             <!-- Features Section -->
             <section class="features-section" id="features">
-                <h3 class="features-title">Advanced Detection Capabilities</h3>
+                <h3 class="features-title">Ultra-Lightweight Detection Features</h3>
                 <div class="features-grid">
                     <div class="feature-item">
-                        <i class="fas fa-brain feature-icon"></i>
-                        <div class="feature-title">Neural Network Analysis</div>
-                        <div class="feature-description">Deep learning models trained on millions of video samples</div>
+                        <i class="fas fa-bolt feature-icon"></i>
+                        <div class="feature-title">Ultra-Fast Processing</div>
+                        <div class="feature-description">Optimized lightweight architecture for rapid analysis</div>
                     </div>
                     <div class="feature-item">
-                        <i class="fas fa-eye feature-icon"></i>
-                        <div class="feature-title">Facial Analysis</div>
-                        <div class="feature-description">Advanced facial landmark and expression pattern detection</div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-clock feature-icon"></i>
-                        <div class="feature-title">Real-time Processing</div>
-                        <div class="feature-description">Fast analysis with detailed frame-by-frame results</div>
+                        <i class="fas fa-broom feature-icon"></i>
+                        <div class="feature-title">Automatic Cleanup</div>
+                        <div class="feature-description">Intelligent file management with zero storage buildup</div>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-shield-alt feature-icon"></i>
                         <div class="feature-title">High Accuracy</div>
-                        <div class="feature-description">Industry-leading detection rates with minimal false positives</div>
+                        <div class="feature-description">Reliable detection with safe detector prioritization</div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-memory feature-icon"></i>
+                        <div class="feature-title">Resource Optimized</div>
+                        <div class="feature-description">Minimal resource usage with intelligent processing</div>
                     </div>
                 </div>
             </section>
         </div>
     </main>
 
+    <!-- UNIFIED FOOTER -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <h3 class="footer-title">SurakshaNetra</h3>
+            <p class="footer-text">Protecting digital authenticity through advanced AI technology</p>
+            <p class="footer-text"><strong>Created by Arijit Mondal</strong></p>
+            
+            <div class="footer-social">
+                <a href="https://github.com/ariktheone/" class="social-link" target="_blank" rel="noopener noreferrer" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/arijitmondal30/" class="social-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://x.com/ArijitM63768876" class="social-link" target="_blank" rel="noopener noreferrer" title="Twitter / X">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="mailto:arijitmondal200430@gmail.com" class="social-link" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                <a href="https://arijitmondal-portfolio.vercel.app/" class="social-link" target="_blank" rel="noopener noreferrer" title="Website">
+                    <i class="fas fa-globe"></i>
+                </a>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 SurakshaNetra by Arijit Mondal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // FIXED JavaScript - Prevents Double File Selection
         document.addEventListener('DOMContentLoaded', function() {
+            // UNIFIED HEADER & FOOTER FUNCTIONALITY
             const header = document.getElementById('header');
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const navMenu = document.getElementById('navMenu');
@@ -731,10 +803,9 @@
                 icon.classList.toggle('fa-times');
             });
 
-            // FIXED: File upload handling - Remove duplicate click handler
+            // File upload functionality
             fileInput.addEventListener('change', handleFileSelect);
             
-            // FIXED: Drag and drop functionality
             fileUploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -762,7 +833,7 @@
             function handleFileSelect() {
                 const file = fileInput.files[0];
                 if (file) {
-                    console.log('File selected:', file.name);
+                    console.log('🎬 File selected:', file.name);
                     
                     const fileName = file.name;
                     const fileSize = (file.size / 1024 / 1024).toFixed(2);
@@ -785,7 +856,7 @@
                     // Show file info
                     fileInfo.innerHTML = `
                         <div class="file-name">📹 ${fileName}</div>
-                        <div class="file-size">📊 Size: ${fileSize} MB</div>
+                        <div class="file-size">📊 Size: ${fileSize} MB | 🧹 Previous files will be auto-deleted</div>
                     `;
                     fileInfo.style.display = 'block';
                     fileInfo.classList.add('show');
@@ -796,8 +867,8 @@
                     // Update upload area
                     uploadContent.innerHTML = `
                         <i class="fas fa-check-circle upload-icon" style="color: var(--success-color);"></i>
-                        <div class="upload-text" style="color: var(--success-color);">✅ File Ready for Analysis</div>
-                        <div class="upload-subtext">Click here to select a different file</div>
+                        <div class="upload-text" style="color: var(--success-color);">✅ Ready for Ultra-Fast Analysis</div>
+                        <div class="upload-subtext">All previous files will be automatically deleted</div>
                         <div class="supported-formats">
                             <span class="format-tag" style="background: var(--success-color); color: white;">Selected: ${file.type.split('/')[1].toUpperCase()}</span>
                         </div>
@@ -834,12 +905,12 @@
                     return;
                 }
 
-                console.log('Form submitting with file:', fileInput.files[0].name);
+                console.log('🚀 Ultra-lightweight processing starting with file:', fileInput.files[0].name);
 
                 // Show loading state
                 submitBtn.innerHTML = `
                     <div class="spinner"></div>
-                    <span class="btn-text">🔍 Analyzing Video...</span>
+                    <span class="btn-text">🧹 Clearing previous files & analyzing...</span>
                 `;
                 submitBtn.disabled = true;
             });
@@ -880,7 +951,7 @@
                 });
             });
 
-            console.log('✅ SurakshaNetra Index Page initialized successfully');
+            console.log('✅ SurakshaNetra Ultra-Lightweight Index Page initialized successfully');
         });
     </script>
 </body>
