@@ -196,17 +196,6 @@
 
         /* Risk Assessment Banner */
         .risk-banner {
-            background: linear-gradient(135deg, 
-                {% if video_info.risk_level.level == 'HIGH' %}
-                    var(--danger-color) 0%, #dc2626 100%
-                {% elif video_info.risk_level.level == 'MODERATE' %}
-                    var(--warning-color) 0%, #d97706 100%
-                {% elif video_info.risk_level.level == 'LOW' %}
-                    var(--accent-color) 0%, #0891b2 100%
-                {% else %}
-                    var(--success-color) 0%, #059669 100%
-                {% endif %}
-            );
             color: var(--white);
             border-radius: var(--border-radius-xl);
             padding: 32px;
@@ -215,6 +204,31 @@
             box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
+        }
+
+        .risk-banner.risk-high {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: 2px solid #fca5a5;
+        }
+
+        .risk-banner.risk-very-suspicious {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            border: 2px solid #fdba74;
+        }
+
+        .risk-banner.risk-suspicious {
+            background: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+            border: 2px solid #fbbf24;
+        }
+
+        .risk-banner.risk-low {
+            background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+            border: 2px solid #67e8f9;
+        }
+
+        .risk-banner.risk-minimal {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border: 2px solid #6ee7b7;
         }
 
         .risk-banner::before {
@@ -237,26 +251,29 @@
             font-size: clamp(48px, 8vw, 72px);
             font-weight: 700;
             margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 1;
         }
 
         .risk-level {
-            font-size: clamp(20px, 4vw, 28px);
+            font-size: clamp(18px, 4vw, 24px);
             font-weight: 600;
             margin-bottom: 12px;
             position: relative;
             z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .risk-description {
             font-size: 16px;
             opacity: 0.95;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 16px;
             position: relative;
             z-index: 1;
+            line-height: 1.6;
         }
 
         .consensus-info {
@@ -270,6 +287,7 @@
             font-weight: 500;
             position: relative;
             z-index: 1;
+            backdrop-filter: blur(10px);
         }
 
         /* Statistics Cards */
@@ -476,58 +494,57 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--primary-color);
         }
 
-        .detector-card.advanced_unified::before { background: var(--danger-color); }
-        .detector-card.unified::before { background: var(--warning-color); }
-        .detector-card.safe::before { background: var(--success-color); }
+        .detector-card.advanced_unified::before { background: #dc2626; }
+        .detector-card.unified::before { background: #d97706; }
+        .detector-card.safe::before { background: #059669; }
 
-        .detector-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .detector-header {
-            display: flex;
-            justify-content: space-between;
+        /* Risk indicator badges */
+        .risk-indicator {
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .detector-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--gray-900);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .detector-status {
+            gap: 6px;
             padding: 4px 12px;
-            border-radius: var(--border-radius);
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-left: 8px;
         }
 
-        .status-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-failed {
-            background: #fee2e2;
+        .risk-indicator.high {
+            background: rgba(220, 38, 38, 0.1);
             color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.2);
         }
 
-        .score-display {
-            text-align: center;
-            margin: 24px 0;
+        .risk-indicator.very-suspicious {
+            background: rgba(234, 88, 12, 0.1);
+            color: #ea580c;
+            border: 1px solid rgba(234, 88, 12, 0.2);
         }
 
+        .risk-indicator.suspicious {
+            background: rgba(217, 119, 6, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .risk-indicator.low {
+            background: rgba(8, 145, 178, 0.1);
+            color: #0891b2;
+            border: 1px solid rgba(8, 145, 178, 0.2);
+        }
+
+        .risk-indicator.minimal {
+            background: rgba(5, 150, 105, 0.1);
+            color: #059669;
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        /* Enhanced Score Circles for Individual Detectors */
         .score-circle {
             width: 120px;
             height: 120px;
@@ -542,219 +559,28 @@
             position: relative;
             overflow: hidden;
             font-family: 'JetBrains Mono', monospace;
+            border: 3px solid rgba(255, 255, 255, 0.2);
         }
 
         .score-high { 
-            background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
         }
-        .score-medium { 
-            background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+        .score-very-suspicious { 
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            box-shadow: 0 0 20px rgba(234, 88, 12, 0.4);
+        }
+        .score-suspicious { 
+            background: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+            box-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
         }
         .score-low { 
-            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+            box-shadow: 0 0 20px rgba(8, 145, 178, 0.4);
         }
-
-        .score-label {
-            color: var(--gray-600);
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detector-details {
-            display: grid;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--gray-100);
-            font-size: 14px;
-        }
-
-        .detail-item:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: var(--gray-600);
-            font-weight: 500;
-        }
-
-        .detail-value {
-            color: var(--gray-900);
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Features Section */
-        .features-section {
-            margin-bottom: 32px;
-        }
-
-        .features-card {
-            background: var(--white);
-            border-radius: var(--border-radius-lg);
-            padding: 32px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-200);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .feature-item {
-            padding: 16px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-
-        .feature-active {
-            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
-            color: var(--white);
-            border-color: var(--success-color);
-        }
-
-        .feature-inactive {
-            background: var(--gray-50);
-            color: var(--gray-500);
-            border-color: var(--gray-200);
-        }
-
-        .feature-icon {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .feature-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        /* Action Buttons */
-        .actions-section {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        .actions-grid {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: var(--white);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-secondary {
-            background: var(--white);
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Error States */
-        .video-error {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            background: var(--gray-50);
-            color: var(--gray-500);
-            border-radius: var(--border-radius);
-            border: 2px dashed var(--gray-300);
-        }
-
-        .error-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-            color: var(--gray-400);
-        }
-
-        .error-message {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 16px;
-            border-radius: var(--border-radius);
-            margin: 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--gray-900);
-            color: var(--white);
-            padding: 32px 0;
-            text-align: center;
-            margin-top: 60px;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .footer-text {
-            color: var(--gray-400);
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            font-size: 12px;
-        }
-
-        .footer-link {
-            color: var(--gray-400);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-link:hover {
-            color: var(--white);
+        .score-minimal { 
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.4);
         }
 
         /* Responsive Design */
@@ -890,14 +716,55 @@
             </div>
 
             <!-- Risk Assessment Banner -->
-            <div class="risk-banner animate-in">
+            <div class="risk-banner 
+                {% if video_info.deepfake_percentage >= 70 %}
+                    risk-high
+                {% elif video_info.deepfake_percentage >= 50 %}
+                    risk-very-suspicious
+                {% elif video_info.deepfake_percentage >= 30 %}
+                    risk-suspicious
+                {% elif video_info.deepfake_percentage >= 15 %}
+                    risk-low
+                {% else %}
+                    risk-minimal
+                {% endif %}
+            ">
                 <div class="risk-score">{{ "%.1f"|format(video_info.deepfake_percentage) }}%</div>
-                <div class="risk-level">{{ video_info.risk_level.level }} RISK DETECTED</div>
-                <div class="risk-description">{{ video_info.risk_level.description }}</div>
+                <div class="risk-level">
+                    {% if video_info.deepfake_percentage >= 70 %}
+                        HIGH RISK - LIKELY DEEPFAKE
+                    {% elif video_info.deepfake_percentage >= 50 %}
+                        VERY SUSPICIOUS - PROBABLE DEEPFAKE
+                    {% elif video_info.deepfake_percentage >= 30 %}
+                        SUSPICIOUS - MAY BE DEEPFAKE
+                    {% elif video_info.deepfake_percentage >= 15 %}
+                        LOW RISK - LIKELY AUTHENTIC
+                    {% else %}
+                        MINIMAL RISK - AUTHENTIC
+                    {% endif %}
+                </div>
+                <div class="risk-description">
+                    {% if video_info.deepfake_percentage >= 70 %}
+                        Strong indicators of artificial manipulation detected. This video is very likely to be a deepfake.
+                    {% elif video_info.deepfake_percentage >= 50 %}
+                        Multiple suspicious patterns identified. High probability of deepfake content.
+                    {% elif video_info.deepfake_percentage >= 30 %}
+                        Some artificial patterns detected. Caution advised - potential deepfake content.
+                    {% elif video_info.deepfake_percentage >= 15 %}
+                        Minor inconsistencies found, but video appears mostly authentic.
+                    {% else %}
+                        No significant artificial patterns detected. Video appears authentic.
+                    {% endif %}
+                </div>
                 <div class="consensus-info">
                     <i class="fas fa-chart-line"></i>
                     Consensus: {{ video_info.analysis_summary.consensus_level.title() }} • 
                     Success Rate: {{ "%.1f"|format(video_info.summary_stats.success_rate) }}%
+                    {% if video_info.deepfake_percentage >= 30 %}
+                        • <i class="fas fa-exclamation-triangle"></i> Exercise Caution
+                    {% else %}
+                        • <i class="fas fa-shield-check"></i> Likely Safe
+                    {% endif %}
                 </div>
             </div>
 
@@ -989,22 +856,24 @@
                             </h3>
                         </div>
                         <div class="video-container">
-                            {% set best_detector = 'advanced_unified' if video_info.processed_videos.advanced_unified.success 
-                                                  else 'unified' if video_info.processed_videos.unified.success 
-                                                  else 'safe' %}
-                            {% if video_info.videos_exist[best_detector] %}
+                            {% if video_info.videos_exist.unified %}
                                 <video class="video-player" controls preload="metadata">
-                                    <source src="{{ video_info.processed_videos[best_detector].url }}" type="video/mp4">
+                                    <source src="{{ video_info.processed_videos.unified.url }}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
-                                <div class="video-overlay">
-                                    {{ best_detector.replace('_', ' ').title() }} Analysis
-                                </div>
+                                <div class="video-overlay">Unified Analysis</div>
                             {% else %}
                                 <div class="video-error">
                                     <i class="fas fa-exclamation-triangle error-icon"></i>
                                     <div><strong>Analysis Unavailable</strong></div>
-                                    <div>Processed video file not accessible</div>
+                                    <div>Unified detector video not accessible</div>
+                                    
+                                    <!-- Show debug info if unified failed -->
+                                    {% if not video_info.analysis_summary.detector_results.unified.success %}
+                                        <div style="margin-top: 12px; font-size: 12px; color: var(--gray-500);">
+                                            Error: {{ video_info.analysis_summary.detector_results.unified.error or 'Processing failed' }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         </div>
@@ -1012,23 +881,61 @@
                             <div class="info-grid">
                                 <div class="info-item">
                                     <span class="info-label">Detection Method</span>
-                                    <span class="info-value">{{ best_detector.replace('_', ' ').title() }}</span>
+                                    <span class="info-value">Unified Detector</span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Confidence Score</span>
-                                    <span class="info-value">{{ "%.1f"|format(video_info.processed_videos[best_detector].score) }}%</span>
+                                    <span class="info-value">
+                                        {% if video_info.analysis_summary.detector_results.unified.success %}
+                                            {{ "%.1f"|format(video_info.analysis_summary.detector_results.unified.score) }}% 
+                                            (conf: {{ "%.2f"|format(video_info.analysis_summary.detector_results.unified.confidence) }})
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Processing Type</span>
                                     <span class="info-value">{{ video_info.detection_method }}</span>
                                 </div>
-                                {% if best_detector in video_info.video_file_info %}
+                                <div class="info-item">
+                                    <span class="info-label">Execution Time</span>
+                                    <span class="info-value">
+                                        {% if video_info.analysis_summary.detector_results.unified.success %}
+                                            {{ "%.1f"|format(video_info.analysis_summary.detector_results.unified.execution_time) }}s
+                                        {% else %}
+                                            Failed
+                                        {% endif %}
+                                    </span>
+                                </div>
                                 <div class="info-item">
                                     <span class="info-label">Output Size</span>
-                                    <span class="info-value">{{ video_info.video_file_info[best_detector].size_mb }}</span>
+                                    <span class="info-value">
+                                        {% if 'unified' in video_info.video_file_info %}
+                                            {{ video_info.video_file_info.unified.size_mb }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </span>
                                 </div>
-                                {% endif %}
                             </div>
+                            
+                            <!-- Unified Detector Actions -->
+                            {% if video_info.videos_exist.unified %}
+                            <div class="analysis-actions" style="margin-top: 16px;">
+                                <a href="{{ video_info.processed_videos.unified.url }}" 
+                                   download="surakshanetre_unified_analysis.mp4" 
+                                   class="btn btn-secondary" 
+                                   style="margin-right: 8px;">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </a>
+                                <button onclick="shareUnifiedAnalysis()" class="btn btn-secondary">
+                                    <i class="fas fa-share"></i>
+                                    Share
+                                </button>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -1050,6 +957,22 @@
                             <div class="detector-name">
                                 <i class="fas fa-microchip"></i>
                                 {{ detector_name.replace('_', ' ').title() }} Detector
+                                {% if detector_data.success %}
+                                    {% set score = detector_data.score %}
+                                    <span class="risk-indicator {{ 'high' if score >= 70 else 'very-suspicious' if score >= 50 else 'suspicious' if score >= 30 else 'low' if score >= 15 else 'minimal' }}">
+                                        {% if score >= 70 %}
+                                            <i class="fas fa-exclamation-triangle"></i> HIGH RISK
+                                        {% elif score >= 50 %}
+                                            <i class="fas fa-exclamation-circle"></i> VERY SUSPICIOUS
+                                        {% elif score >= 30 %}
+                                            <i class="fas fa-exclamation"></i> SUSPICIOUS
+                                        {% elif score >= 15 %}
+                                            <i class="fas fa-info-circle"></i> LOW RISK
+                                        {% else %}
+                                            <i class="fas fa-shield-check"></i> MINIMAL
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
                             </div>
                             <div class="detector-status {{ 'status-success' if detector_data.success else 'status-failed' }}">
                                 {{ 'Success' if detector_data.success else 'Failed' }}
@@ -1059,10 +982,22 @@
                         {% if detector_data.success %}
                         <div class="score-display">
                             {% set score = detector_data.score %}
-                            <div class="score-circle {{ 'score-high' if score > 60 else 'score-medium' if score > 30 else 'score-low' }}">
+                            <div class="score-circle {{ 'score-high' if score >= 70 else 'score-very-suspicious' if score >= 50 else 'score-suspicious' if score >= 30 else 'score-low' if score >= 15 else 'score-minimal' }}">
                                 {{ "%.0f"|format(score) }}%
                             </div>
-                            <div class="score-label">Deepfake Probability</div>
+                            <div class="score-label">
+                                {% if score >= 70 %}
+                                    Likely Deepfake
+                                {% elif score >= 50 %}
+                                    Probable Deepfake
+                                {% elif score >= 30 %}
+                                    May Be Deepfake
+                                {% elif score >= 15 %}
+                                    Likely Authentic
+                                {% else %}
+                                    Authentic
+                                {% endif %}
+                            </div>
                         </div>
                         
                         <div class="detector-details">
@@ -1073,6 +1008,22 @@
                             <div class="detail-item">
                                 <span class="detail-label">Confidence Level</span>
                                 <span class="detail-value">{{ "%.2f"|format(detector_data.confidence) }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Risk Assessment</span>
+                                <span class="detail-value">
+                                    {% if score >= 70 %}
+                                        High Risk
+                                    {% elif score >= 50 %}
+                                        Very Suspicious
+                                    {% elif score >= 30 %}
+                                        Suspicious
+                                    {% elif score >= 15 %}
+                                        Low Risk
+                                    {% else %}
+                                        Minimal Risk
+                                    {% endif %}
+                                </span>
                             </div>
                             {% if detector_name in video_info.processed_videos %}
                             <div class="detail-item">
@@ -1260,6 +1211,130 @@
 
             console.log('✅ SurakshaNetra Results Page initialized successfully');
         });
+        
+        // Unified Analysis Sharing Function
+        function shareUnifiedAnalysis() {
+            const unifiedData = {
+                score: {{ video_info.analysis_summary.detector_results.unified.score if video_info.analysis_summary.detector_results.unified.success else 0 }},
+                confidence: {{ video_info.analysis_summary.detector_results.unified.confidence if video_info.analysis_summary.detector_results.unified.success else 0 }},
+                executionTime: {{ video_info.analysis_summary.detector_results.unified.execution_time if video_info.analysis_summary.detector_results.unified.success else 0 }}
+            };
+            
+            const shareData = {
+                title: 'SurakshaNetra Unified AI Analysis Result',
+                text: `Deepfake detection analysis: ${unifiedData.score.toFixed(1)}% probability using Unified Detector (confidence: ${unifiedData.confidence.toFixed(2)})`,
+                url: window.location.href
+            };
+            
+            if (navigator.share) {
+                navigator.share(shareData).then(() => {
+                    console.log('✅ Unified analysis shared successfully');
+                    showAlert('Analysis shared successfully!', 'success');
+                }).catch((error) => {
+                    console.log('⚠️ Error sharing:', error);
+                    fallbackShareUnified(shareData);
+                });
+            } else {
+                fallbackShareUnified(shareData);
+            }
+        }
+
+        function fallbackShareUnified(shareData) {
+            // Copy to clipboard as fallback
+            const shareText = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showAlert('Unified analysis details copied to clipboard!', 'success');
+                }).catch(() => {
+                    showAlert('Unable to copy to clipboard', 'error');
+                });
+            } else {
+                // Create temporary textarea for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = shareText;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showAlert('Unified analysis details copied to clipboard!', 'success');
+                } catch (err) {
+                    showAlert('Sharing not supported on this device', 'warning');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                z-index: 1000;
+                background: ${type === 'success' ? '#d1fae5' : type === 'error' ? '#fee2e2' : '#fef3c7'};
+                border: 1px solid ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b'};
+                color: ${type === 'success' ? '#065f46' : type === 'error' ? '#dc2626' : '#92400e'};
+                padding: 12px 16px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                max-width: 300px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button type="button" onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    cursor: pointer;
+                    margin-left: auto;
+                    padding: 2px;
+                ">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.style.animation = 'slideOutRight 0.3s ease forwards';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }
+            }, 4000);
+        }
+
+        // Make function globally available
+        window.shareUnifiedAnalysis = shareUnifiedAnalysis;
+
+        // Add CSS for alert animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

@@ -2,9 +2,19 @@ import cv2
 import numpy as np
 import time
 import os
+import shutil
 from sklearn.metrics.pairwise import cosine_similarity
 import warnings
 warnings.filterwarnings('ignore')
+
+# Import fixed video creator
+try:
+    from video_creator_fixed import create_processed_video_reliable
+    VIDEO_CREATOR_AVAILABLE = True
+    print("✅ Fixed video creator available for safe detector")
+except ImportError:
+    VIDEO_CREATOR_AVAILABLE = False
+    print("⚠️ Video creator not available for safe detector")
 
 class SafeDeepfakeDetector:
     """Import-safe deepfake detector that doesn't rely on problematic dependencies"""
@@ -324,156 +334,173 @@ class SafeDeepfakeDetector:
             return 0.0
 
 def run_safe_detection(video_path, output_path):
-    """Run safe deepfake detection without problematic imports"""
+    """FIXED: Safe deepfake detection with guaranteed video creation"""
     start_time = time.time()
     
     try:
-        print("🛡️ Starting Safe Deepfake Detection (Import-Safe Version)...")
+        print("🛡️ Starting FIXED Safe Deepfake Detection...")
+        print(f"📁 Input: {video_path} ({os.path.getsize(video_path):,} bytes)")
+        print(f"📁 Output: {output_path}")
+        
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
         detector = SafeDeepfakeDetector()
-        
-        cap = cv2.VideoCapture(video_path)
-        
-        if not cap.isOpened():
-            print(f"❌ Could not open video: {video_path}")
-            return 25.0
-        
-        # Get video properties
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
-        print(f"📊 Video: {fps} fps, {width}x{height}, {total_frames} frames")
-        
-        # Initialize video writer
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-        
-        if not out.isOpened():
-            print("⚠️ Video writer failed, analysis-only mode")
-            out = None
-        
-        # Processing variables
-        frame_skip = max(1, fps // 3)  # Process 3 frames per second
         deepfake_probabilities = []
-        frame_count = 0
         processed_faces = 0
+        frame_count = 0
         
-        print(f"🎬 Processing video with safe detection methods...")
-        
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
+        # Define frame processing function
+        def process_frame_with_detection(frame, frame_num, detection_score):
+            """Process frame with safe detection and overlay"""
+            nonlocal deepfake_probabilities, processed_faces, frame_count
             
             display_frame = frame.copy()
+            frame_count = frame_num
             
-            # Process every nth frame
-            if frame_count % frame_skip == 0:
+            # Run detection every 5th frame
+            if frame_num % 5 == 0:
                 try:
-                    # Detect faces using OpenCV
+                    # Detect faces
                     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     faces = detector.face_cascade.detectMultiScale(gray, 1.1, 4)
                     
                     if len(faces) > 0:
-                        # Process the largest face
+                        # Process largest face
                         largest_face = max(faces, key=lambda f: f[2] * f[3])
                         x, y, w, h = largest_face
                         
-                        # Extract face
+                        # Extract and analyze face
                         face_img = frame[y:y+h, x:x+w]
-                        
                         if face_img.size > 0:
-                            # Detect deepfake probability
-                            deepfake_prob = detector.detect_deepfake_probability(face_img)
-                            deepfake_probabilities.append(deepfake_prob)
+                            prob = detector.detect_deepfake_probability(face_img)
+                            deepfake_probabilities.append(prob)
                             processed_faces += 1
                             
-                            # Visual feedback
-                            confidence = deepfake_prob * 100
-                            
-                            if deepfake_prob > 0.6:
+                            # Add face detection visualization
+                            confidence = prob * 100
+                            if prob > 0.6:
                                 color = (0, 0, 255)  # Red
                                 label = f'DEEPFAKE ({confidence:.1f}%)'
-                                thickness = 3
-                            elif deepfake_prob > 0.4:
+                            elif prob > 0.4:
                                 color = (0, 165, 255)  # Orange
                                 label = f'SUSPICIOUS ({confidence:.1f}%)'
-                                thickness = 2
                             else:
                                 color = (0, 255, 0)  # Green
                                 label = f'AUTHENTIC ({100-confidence:.1f}%)'
-                                thickness = 2
                             
-                            # Draw bounding box and label
-                            cv2.rectangle(display_frame, (x, y), (x+w, y+h), color, thickness)
+                            # Draw face box
+                            cv2.rectangle(display_frame, (x, y), (x+w, y+h), color, 2)
                             
-                            # Label background
+                            # Add label
                             label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
-                            cv2.rectangle(display_frame, (x, y-30), (x+label_size[0]+10, y), color, -1)
-                            cv2.putText(display_frame, label, (x+5, y-10), 
+                            cv2.rectangle(display_frame, (x, y-25), (x+label_size[0]+10, y), color, -1)
+                            cv2.putText(display_frame, label, (x+5, y-8), 
                                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-                            
-                            # Additional info
-                            method_text = f"Safe Detection: {len(deepfake_probabilities)} samples"
-                            cv2.putText(display_frame, method_text, (x, y+h+20), 
-                                      cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
-                    
-                    else:
-                        cv2.putText(display_frame, 'No Face Detected', (50, 50), 
-                                  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
                 
-                except Exception as frame_error:
-                    print(f"⚠️ Frame processing error: {frame_error}")
-                    cv2.putText(display_frame, 'Processing Error', (50, 50), 
-                              cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                except Exception as e:
+                    print(f"⚠️ Frame {frame_num} detection error: {e}")
             
-            # Add overall statistics
+            # Add main overlay
+            current_score = detection_score
             if deepfake_probabilities:
-                avg_prob = np.mean(deepfake_probabilities)
-                status_text = f"Safe Detection: {avg_prob*100:.1f}% | Faces: {processed_faces}"
+                current_score = np.mean(deepfake_probabilities) * 100
+            
+            # Create overlay
+            overlay = display_frame.copy()
+            h, w = display_frame.shape[:2]
+            
+            # Status bar
+            cv2.rectangle(overlay, (0, 0), (w, 50), (0, 0, 0), -1)
+            
+            # Score indication
+            if current_score > 60:
+                bar_color = (0, 0, 255)
+                risk_text = "HIGH RISK"
+            elif current_score > 30:
+                bar_color = (0, 165, 255)
+                risk_text = "MEDIUM RISK"
             else:
-                status_text = f"Safe Analysis... Faces: {processed_faces}"
+                bar_color = (0, 255, 0)
+                risk_text = "LOW RISK"
             
-            cv2.rectangle(display_frame, (10, 10), (500, 40), (0, 0, 0), -1)
-            cv2.putText(display_frame, status_text, (15, 30), 
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            # Main text
+            main_text = f"Safe Detection: {risk_text} - {current_score:.1f}%"
+            cv2.putText(overlay, main_text, (20, 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
             
-            # Write frame
-            if out is not None:
-                out.write(display_frame)
+            # Stats
+            stats_text = f"Faces: {processed_faces} | Samples: {len(deepfake_probabilities)}"
+            cv2.putText(overlay, stats_text, (w-300, 30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
             
-            frame_count += 1
-            
-            # Progress update
-            if frame_count % 100 == 0:
-                progress = (frame_count / total_frames) * 100
-                print(f"📈 Progress: {progress:.1f}% | Safe analysis: {processed_faces} faces")
+            # Blend overlay
+            result = cv2.addWeighted(display_frame, 0.8, overlay, 0.2, 0)
+            return result
         
-        # Cleanup
-        cap.release()
-        if out is not None:
-            out.release()
+        # Quick initial analysis
+        initial_score = 20.0
+        try:
+            cap = cv2.VideoCapture(video_path)
+            if cap.isOpened():
+                quick_probs = []
+                for _ in range(3):  # Analyze first 3 frames
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = detector.face_cascade.detectMultiScale(gray, 1.1, 4)
+                    
+                    if len(faces) > 0:
+                        largest_face = max(faces, key=lambda f: f[2] * f[3])
+                        x, y, w, h = largest_face
+                        face_img = frame[y:y+h, x:x+w]
+                        if face_img.size > 0:
+                            prob = detector.detect_deepfake_probability(face_img)
+                            quick_probs.append(prob)
+                
+                cap.release()
+                
+                if quick_probs:
+                    initial_score = np.mean(quick_probs) * 100
+                    print(f"📊 Quick safe analysis: {initial_score:.1f}%")
+        
+        except Exception as e:
+            print(f"⚠️ Quick analysis failed: {e}")
+        
+        # Create processed video
+        print(f"🎬 Creating processed video with safe detection...")
+        if VIDEO_CREATOR_AVAILABLE:
+            video_created = create_processed_video_reliable(
+                video_path, output_path, initial_score, process_frame_with_detection
+            )
+        else:
+            # Fallback
+            video_created = copy_video_simple(video_path, output_path)
         
         # Calculate final score
         if deepfake_probabilities:
             final_score = np.mean(deepfake_probabilities) * 100
             print(f"🎯 Safe Detection Complete:")
             print(f"   - Faces analyzed: {processed_faces}")
-            print(f"   - Average deepfake probability: {final_score:.1f}%")
-            print(f"   - Samples collected: {len(deepfake_probabilities)}")
+            print(f"   - Final score: {final_score:.1f}%")
+            print(f"   - Samples: {len(deepfake_probabilities)}")
         else:
-            final_score = 20.0
-            print(f"⚠️ No faces detected for safe analysis")
+            final_score = initial_score
+            print(f"🎯 Safe Detection Complete (no faces): {final_score:.1f}%")
         
-        # Ensure output file exists
-        if not os.path.exists(output_path) or os.path.getsize(output_path) < 1000:
-            print("🔄 Creating fallback video...")
+        # Verify output
+        if video_created and os.path.exists(output_path):
+            file_size = os.path.getsize(output_path)
+            print(f"✅ Safe video created: {file_size:,} bytes")
+        else:
+            print("❌ Safe video creation failed, creating copy...")
             try:
-                import shutil
                 shutil.copy2(video_path, output_path)
+                print("✅ Emergency copy created")
             except Exception as e:
-                print(f"❌ Fallback failed: {e}")
+                print(f"❌ Emergency copy failed: {e}")
         
         end_time = time.time()
         print(f"⏱️ Safe detection completed in {end_time - start_time:.2f} seconds")
@@ -482,17 +509,22 @@ def run_safe_detection(video_path, output_path):
         
     except Exception as e:
         print(f"💥 Safe detection error: {e}")
-        import traceback
-        traceback.print_exc()
         
-        # Fallback
+        # Emergency fallback
         try:
-            import shutil
             shutil.copy2(video_path, output_path)
+            return 30.0
         except:
-            pass
-        
-        return 30.0
+            return 25.0
+
+def copy_video_simple(input_path, output_path):
+    """Simple video copy"""
+    try:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        shutil.copy2(input_path, output_path)
+        return os.path.exists(output_path) and os.path.getsize(output_path) > 1000
+    except:
+        return False
 
 def run(video_path, video_path2):
     """Main function for safe deepfake detection"""

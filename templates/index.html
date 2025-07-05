@@ -237,7 +237,7 @@
             font-size: 16px;
         }
 
-        /* File Upload */
+        /* File Upload - FIXED VERSION */
         .file-upload-wrapper {
             margin-bottom: 32px;
         }
@@ -256,8 +256,7 @@
 
         .file-upload-area:hover {
             border-color: var(--primary-color);
-            background: var(--primary-color);
-            background-opacity: 0.05;
+            background: rgba(37, 99, 235, 0.05);
         }
 
         .file-upload-area.dragover {
@@ -274,6 +273,13 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+            z-index: 10;
+        }
+
+        .upload-content {
+            pointer-events: none; /* Prevent double click events */
+            position: relative;
+            z-index: 1;
         }
 
         .upload-icon {
@@ -324,6 +330,7 @@
             background: var(--gray-100);
             border-radius: var(--border-radius);
             border-left: 4px solid var(--success-color);
+            display: none;
         }
 
         .file-info.show {
@@ -640,7 +647,7 @@
                                    accept=".mp4,.avi,.mov,.mkv,.webm" 
                                    required>
                             
-                            <div class="upload-content">
+                            <div class="upload-content" id="uploadContent">
                                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                                 <div class="upload-text">Choose Video File</div>
                                 <div class="upload-subtext">or drag and drop it here</div>
@@ -655,7 +662,7 @@
                             </div>
                         </div>
                         
-                        <div class="file-info" id="fileInfo" style="display: none;"></div>
+                        <div class="file-info" id="fileInfo"></div>
                     </div>
                     
                     <button type="submit" class="submit-btn" id="submitBtn" disabled>
@@ -695,13 +702,14 @@
     </main>
 
     <script>
-        // Enhanced JavaScript functionality
+        // FIXED JavaScript - Prevents Double File Selection
         document.addEventListener('DOMContentLoaded', function() {
             const header = document.getElementById('header');
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const navMenu = document.getElementById('navMenu');
             const fileInput = document.getElementById('fileInput');
             const fileUploadArea = document.getElementById('fileUploadArea');
+            const uploadContent = document.getElementById('uploadContent');
             const fileInfo = document.getElementById('fileInfo');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
@@ -723,22 +731,25 @@
                 icon.classList.toggle('fa-times');
             });
 
-            // File upload handling
+            // FIXED: File upload handling - Remove duplicate click handler
             fileInput.addEventListener('change', handleFileSelect);
-            fileUploadArea.addEventListener('click', () => fileInput.click());
             
-            // Drag and drop functionality
+            // FIXED: Drag and drop functionality
             fileUploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 fileUploadArea.classList.add('dragover');
             });
 
-            fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 fileUploadArea.classList.remove('dragover');
             });
 
             fileUploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 fileUploadArea.classList.remove('dragover');
                 
                 const files = e.dataTransfer.files;
@@ -751,6 +762,8 @@
             function handleFileSelect() {
                 const file = fileInput.files[0];
                 if (file) {
+                    console.log('File selected:', file.name);
+                    
                     const fileName = file.name;
                     const fileSize = (file.size / 1024 / 1024).toFixed(2);
                     
@@ -771,8 +784,8 @@
 
                     // Show file info
                     fileInfo.innerHTML = `
-                        <div class="file-name">${fileName}</div>
-                        <div class="file-size">${fileSize} MB</div>
+                        <div class="file-name">📹 ${fileName}</div>
+                        <div class="file-size">📊 Size: ${fileSize} MB</div>
                     `;
                     fileInfo.style.display = 'block';
                     fileInfo.classList.add('show');
@@ -781,11 +794,13 @@
                     submitBtn.disabled = false;
                     
                     // Update upload area
-                    const uploadContent = fileUploadArea.querySelector('.upload-content');
                     uploadContent.innerHTML = `
                         <i class="fas fa-check-circle upload-icon" style="color: var(--success-color);"></i>
-                        <div class="upload-text" style="color: var(--success-color);">File Selected</div>
-                        <div class="upload-subtext">Click to choose a different file</div>
+                        <div class="upload-text" style="color: var(--success-color);">✅ File Ready for Analysis</div>
+                        <div class="upload-subtext">Click here to select a different file</div>
+                        <div class="supported-formats">
+                            <span class="format-tag" style="background: var(--success-color); color: white;">Selected: ${file.type.split('/')[1].toUpperCase()}</span>
+                        </div>
                     `;
                 }
             }
@@ -793,10 +808,10 @@
             function resetFileInput() {
                 fileInput.value = '';
                 fileInfo.style.display = 'none';
+                fileInfo.classList.remove('show');
                 submitBtn.disabled = true;
                 
                 // Reset upload area
-                const uploadContent = fileUploadArea.querySelector('.upload-content');
                 uploadContent.innerHTML = `
                     <i class="fas fa-cloud-upload-alt upload-icon"></i>
                     <div class="upload-text">Choose Video File</div>
@@ -819,10 +834,12 @@
                     return;
                 }
 
+                console.log('Form submitting with file:', fileInput.files[0].name);
+
                 // Show loading state
                 submitBtn.innerHTML = `
                     <div class="spinner"></div>
-                    <span class="btn-text">Processing Video...</span>
+                    <span class="btn-text">🔍 Analyzing Video...</span>
                 `;
                 submitBtn.disabled = true;
             });
@@ -862,6 +879,8 @@
                     }
                 });
             });
+
+            console.log('✅ SurakshaNetra Index Page initialized successfully');
         });
     </script>
 </body>
