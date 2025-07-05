@@ -2,13 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 import os
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time as current_time
 import traceback
 import importlib
 import shutil
 import concurrent.futures
 import numpy as np
+import glob
 
 app = Flask(__name__)
 app.secret_key = 'deepfake_detector_secret_key_2024'
@@ -78,42 +79,369 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max file size
 
+# ENHANCED LIGHTWEIGHT VIDEO CLEANUP CONFIGURATION
+VIDEO_CLEANUP_CONFIG = {
+    'max_videos_total': 6,         # Maximum total videos to keep (reduced for lightweight)
+    'max_original_videos': 3,      # Maximum original videos to keep
+    'max_processed_videos': 3,     # Maximum processed videos to keep  
+    'max_age_minutes': 30,         # Maximum age in minutes (much shorter for lightweight)
+    'max_directory_size_mb': 512,  # Maximum directory size in MB (reduced to 512MB)
+    'cleanup_on_upload': True,     # Clean up on each upload
+    'cleanup_on_startup': True,    # Clean up on server startup
+    'aggressive_cleanup': True,    # Enable aggressive cleanup for lightweight arch
+    'keep_only_latest_session': True,  # Keep only files from the latest session
+    'auto_cleanup_interval': 300   # Auto cleanup every 5 minutes
+}
+
 def generate_video_id():
     """Generate unique video ID"""
     return str(int(current_time() * 1000))
 
-class AdvancedSmartDeepfakeDetector:
-    """Advanced intelligent multi-model deepfake detection system"""
+def get_video_files_info(directory):
+    """Get detailed information about all video files in directory"""
+    video_extensions = ('mp4', 'avi', 'mov', 'mkv', 'webm')
+    video_files = []
+    
+    try:
+        for filename in os.listdir(directory):
+            if filename.lower().endswith(video_extensions):
+                filepath = os.path.join(directory, filename)
+                if os.path.isfile(filepath):
+                    stat = os.stat(filepath)
+                    
+                    # Categorize file type
+                    file_type = 'unknown'
+                    if filename.startswith('uploaded_video_'):
+                        file_type = 'original'
+                    elif filename.startswith('processed_'):
+                        file_type = 'processed'
+                    elif any(detector in filename for detector in ['advanced_unified', 'unified', 'safe']):
+                        file_type = 'processed'
+                    
+                    # Extract timestamp if possible
+                    timestamp = None
+                    try:
+                        if '_' in filename:
+                            parts = filename.split('_')
+                            for part in parts:
+                                if part.replace('.mp4', '').replace('.avi', '').replace('.mov', '').isdigit():
+                                    timestamp = int(part.replace('.mp4', '').replace('.avi', '').replace('.mov', ''))
+                                    break
+                    except:
+                        pass
+                    
+                    video_files.append({
+                        'filename': filename,
+                        'filepath': filepath,
+                        'size_bytes': stat.st_size,
+                        'size_mb': stat.st_size / (1024 * 1024),
+                        'created_time': stat.st_ctime,
+                        'modified_time': stat.st_mtime,
+                        'age_hours': (current_time() - stat.st_ctime) / 3600,
+                        'age_minutes': (current_time() - stat.st_ctime) / 60,
+                        'file_type': file_type,
+                        'timestamp': timestamp
+                    })
+    except Exception as e:
+        print(f"⚠️ Error getting video files info: {e}")
+    
+    return sorted(video_files, key=lambda x: x['created_time'], reverse=True)
+
+def aggressive_cleanup_old_videos(directory, keep_current_session_files=None):
+    """AGGRESSIVE cleanup for lightweight architecture"""
+    try:
+        print(f"🧹 Starting AGGRESSIVE lightweight cleanup for: {directory}")
+        
+        # Get all video files info
+        video_files = get_video_files_info(directory)
+        
+        if not video_files:
+            print("📁 No video files found for cleanup")
+            return {'deleted_count': 0, 'freed_space_mb': 0, 'remaining_files': 0, 'final_size_mb': 0}
+        
+        # Files to keep (current session)
+        keep_files = set(keep_current_session_files or [])
+        
+        # Calculate total directory size
+        total_size_mb = sum(f['size_mb'] for f in video_files)
+        print(f"📊 Current directory size: {total_size_mb:.2f} MB")
+        print(f"📁 Total video files: {len(video_files)}")
+        
+        files_to_delete = []
+        files_to_keep = []
+        
+        # STRATEGY 1: Keep only files from current session
+        if VIDEO_CLEANUP_CONFIG['keep_only_latest_session'] and keep_files:
+            print("🎯 AGGRESSIVE: Keeping only current session files")
+            
+            for file_info in video_files:
+                if file_info['filename'] in keep_files:
+                    files_to_keep.append(file_info)
+                    print(f"🔒 Keeping current session: {file_info['filename']}")
+                else:
+                    files_to_delete.append(file_info)
+                    print(f"🗑️ Marking for deletion (not current session): {file_info['filename']}")
+        
+        else:
+            # STRATEGY 2: Keep only the most recent files by type
+            original_files = [f for f in video_files if f['file_type'] == 'original']
+            processed_files = [f for f in video_files if f['file_type'] == 'processed']
+            
+            # Keep only the newest original files
+            original_files.sort(key=lambda x: x['created_time'], reverse=True)
+            keep_originals = original_files[:VIDEO_CLEANUP_CONFIG['max_original_videos']]
+            
+            # Keep only the newest processed files
+            processed_files.sort(key=lambda x: x['created_time'], reverse=True)
+            keep_processed = processed_files[:VIDEO_CLEANUP_CONFIG['max_processed_videos']]
+            
+            # Files to keep
+            for file_info in keep_originals + keep_processed:
+                if file_info['filename'] in keep_files or file_info['age_minutes'] < 5:  # Always keep very recent files
+                    files_to_keep.append(file_info)
+                    print(f"🔒 Keeping recent {file_info['file_type']}: {file_info['filename']} (age: {file_info['age_minutes']:.1f}min)")
+            
+            # Everything else gets deleted
+            for file_info in video_files:
+                if file_info not in files_to_keep:
+                    files_to_delete.append(file_info)
+                    print(f"🗑️ Marking for deletion: {file_info['filename']} (age: {file_info['age_minutes']:.1f}min, {file_info['size_mb']:.2f}MB)")
+        
+        # STRATEGY 3: Delete files older than max age (very short for lightweight)
+        max_age_files = [f for f in files_to_keep if f['age_minutes'] > VIDEO_CLEANUP_CONFIG['max_age_minutes']]
+        for file_info in max_age_files:
+            if file_info['filename'] not in keep_files:  # Don't delete current session files
+                files_to_delete.append(file_info)
+                files_to_keep.remove(file_info)
+                print(f"⏰ Moving to deletion (too old): {file_info['filename']} (age: {file_info['age_minutes']:.1f}min)")
+        
+        # STRATEGY 4: If still too large, delete largest files first
+        kept_size = sum(f['size_mb'] for f in files_to_keep)
+        if kept_size > VIDEO_CLEANUP_CONFIG['max_directory_size_mb']:
+            print(f"💾 Still too large ({kept_size:.2f} MB), removing largest files...")
+            
+            # Sort by size (largest first) and age (oldest first)
+            files_to_keep.sort(key=lambda x: (x['size_mb'], x['age_minutes']), reverse=True)
+            
+            target_size = VIDEO_CLEANUP_CONFIG['max_directory_size_mb'] * 0.7  # Target 70% of max
+            current_size = 0
+            final_keep_list = []
+            
+            for file_info in files_to_keep:
+                if file_info['filename'] in keep_files:
+                    # Always keep current session files
+                    final_keep_list.append(file_info)
+                    current_size += file_info['size_mb']
+                elif current_size + file_info['size_mb'] <= target_size:
+                    final_keep_list.append(file_info)
+                    current_size += file_info['size_mb']
+                else:
+                    files_to_delete.append(file_info)
+                    print(f"💾 Moving to deletion (size limit): {file_info['filename']} ({file_info['size_mb']:.2f}MB)")
+            
+            files_to_keep = final_keep_list
+        
+        # Execute deletions
+        deleted_count = 0
+        freed_space_mb = 0
+        
+        for file_info in files_to_delete:
+            try:
+                if os.path.exists(file_info['filepath']):
+                    os.remove(file_info['filepath'])
+                    deleted_count += 1
+                    freed_space_mb += file_info['size_mb']
+                    print(f"🗑️ Deleted: {file_info['filename']} ({file_info['size_mb']:.2f} MB)")
+            except Exception as e:
+                print(f"❌ Failed to delete {file_info['filename']}: {e}")
+        
+        # Final report
+        remaining_files = get_video_files_info(directory)
+        final_size_mb = sum(f['size_mb'] for f in remaining_files)
+        
+        print(f"✅ AGGRESSIVE cleanup completed:")
+        print(f"   📉 Files deleted: {deleted_count}")
+        print(f"   💾 Space freed: {freed_space_mb:.2f} MB")
+        print(f"   📁 Remaining files: {len(remaining_files)}")
+        print(f"   📊 Final directory size: {final_size_mb:.2f} MB")
+        print(f"   🎯 Lightweight target achieved: {final_size_mb <= VIDEO_CLEANUP_CONFIG['max_directory_size_mb']}")
+        
+        return {
+            'deleted_count': deleted_count,
+            'freed_space_mb': freed_space_mb,
+            'remaining_files': len(remaining_files),
+            'final_size_mb': final_size_mb,
+            'lightweight_target_achieved': final_size_mb <= VIDEO_CLEANUP_CONFIG['max_directory_size_mb']
+        }
+        
+    except Exception as e:
+        print(f"💥 Error during aggressive cleanup: {e}")
+        traceback.print_exc()
+        return None
+
+def cleanup_processed_files_by_pattern(directory):
+    """Clean up processed files by pattern matching"""
+    try:
+        print("🧹 Cleaning up processed files by pattern...")
+        
+        # Patterns for processed files
+        patterns = [
+            'processed_*_advanced_unified.mp4',
+            'processed_*_unified.mp4', 
+            'processed_*_safe.mp4',
+            'processed_*.mp4'
+        ]
+        
+        deleted_count = 0
+        freed_space_mb = 0
+        
+        for pattern in patterns:
+            files = glob.glob(os.path.join(directory, pattern))
+            for file_path in files:
+                try:
+                    if os.path.exists(file_path):
+                        file_size = os.path.getsize(file_path) / (1024 * 1024)
+                        
+                        # Check if file is older than 5 minutes (keep very recent ones)
+                        file_age_minutes = (current_time() - os.path.getctime(file_path)) / 60
+                        
+                        if file_age_minutes > 5:  # Only delete files older than 5 minutes
+                            os.remove(file_path)
+                            deleted_count += 1
+                            freed_space_mb += file_size
+                            print(f"🗑️ Deleted processed file: {os.path.basename(file_path)} ({file_size:.2f} MB)")
+                        else:
+                            print(f"🔒 Keeping recent processed file: {os.path.basename(file_path)} (age: {file_age_minutes:.1f}min)")
+                except Exception as e:
+                    print(f"❌ Failed to delete {file_path}: {e}")
+        
+        print(f"✅ Pattern cleanup completed: {deleted_count} files, {freed_space_mb:.2f} MB freed")
+        return {'deleted_count': deleted_count, 'freed_space_mb': freed_space_mb}
+        
+    except Exception as e:
+        print(f"💥 Error during pattern cleanup: {e}")
+        return {'deleted_count': 0, 'freed_space_mb': 0}
+
+def emergency_cleanup(directory):
+    """Emergency cleanup when directory is too full"""
+    try:
+        print("🆘 EMERGENCY CLEANUP: Directory critically full!")
+        
+        video_files = get_video_files_info(directory)
+        total_size_mb = sum(f['size_mb'] for f in video_files)
+        
+        if total_size_mb < VIDEO_CLEANUP_CONFIG['max_directory_size_mb']:
+            print("✅ Directory size is acceptable, no emergency cleanup needed")
+            return
+        
+        print(f"⚠️ Directory size: {total_size_mb:.2f} MB (limit: {VIDEO_CLEANUP_CONFIG['max_directory_size_mb']} MB)")
+        
+        # Sort files by age (oldest first) and size (largest first)
+        video_files.sort(key=lambda x: (x['age_minutes'], -x['size_mb']))
+        
+        target_size = VIDEO_CLEANUP_CONFIG['max_directory_size_mb'] * 0.5  # Target 50% of max
+        current_size = total_size_mb
+        deleted_count = 0
+        
+        for file_info in video_files:
+            if current_size <= target_size:
+                break
+                
+            try:
+                if os.path.exists(file_info['filepath']):
+                    os.remove(file_info['filepath'])
+                    current_size -= file_info['size_mb']
+                    deleted_count += 1
+                    print(f"🆘 Emergency deleted: {file_info['filename']} ({file_info['size_mb']:.2f} MB)")
+            except Exception as e:
+                print(f"❌ Emergency deletion failed for {file_info['filename']}: {e}")
+        
+        print(f"🆘 Emergency cleanup completed: {deleted_count} files deleted")
+        
+    except Exception as e:
+        print(f"💥 Emergency cleanup failed: {e}")
+
+def cleanup_on_startup():
+    """Comprehensive cleanup on server startup"""
+    try:
+        print("🚀 Performing comprehensive startup cleanup...")
+        
+        # 1. Pattern-based cleanup of processed files
+        pattern_result = cleanup_processed_files_by_pattern(UPLOAD_FOLDER)
+        
+        # 2. Aggressive cleanup
+        cleanup_result = aggressive_cleanup_old_videos(UPLOAD_FOLDER)
+        
+        # 3. Emergency cleanup if still too large
+        video_files = get_video_files_info(UPLOAD_FOLDER)
+        total_size_mb = sum(f['size_mb'] for f in video_files)
+        
+        if total_size_mb > VIDEO_CLEANUP_CONFIG['max_directory_size_mb']:
+            emergency_cleanup(UPLOAD_FOLDER)
+        
+        # Final status
+        final_files = get_video_files_info(UPLOAD_FOLDER)
+        final_size_mb = sum(f['size_mb'] for f in final_files)
+        
+        print(f"🎯 Startup cleanup summary:")
+        print(f"   📁 Files remaining: {len(final_files)}")
+        print(f"   📊 Final size: {final_size_mb:.2f} MB")
+        print(f"   ✅ Lightweight target: {final_size_mb <= VIDEO_CLEANUP_CONFIG['max_directory_size_mb']}")
+        
+    except Exception as e:
+        print(f"⚠️ Startup cleanup failed: {e}")
+
+def get_current_session_files(timestamp):
+    """Get list of files from current upload session"""
+    patterns = [
+        f"uploaded_video_{timestamp}.mp4",
+        f"processed_{timestamp}*.mp4"
+    ]
+    
+    current_files = []
+    for pattern in patterns:
+        matching_files = glob.glob(os.path.join(UPLOAD_FOLDER, pattern))
+        current_files.extend([os.path.basename(f) for f in matching_files])
+    
+    return current_files
+
+class LightweightSmartDeepfakeDetector:
+    """Lightweight intelligent multi-model deepfake detection system"""
     
     def __init__(self):
         self.detection_results = {}
-        # Updated confidence weights - prioritize advanced unified detector
+        # Optimized confidence weights for lightweight architecture
         self.confidence_weights = {
-            'advanced_unified': 0.60,   # Highest weight for advanced unified detector
-            'unified': 0.25,            # Medium weight for unified detector
-            'safe': 0.15               # Lower weight for safe detector
+            'safe': 0.70,              # Prioritize safe detector (fastest, most reliable)
+            'unified': 0.20,           # Medium weight for unified detector
+            'advanced_unified': 0.10   # Lower weight for advanced (slower, resource heavy)
         }
     
     def run_detector_safely(self, detector_name, video_path, output_path):
-        """Safely run a detector and return results"""
+        """Safely run a detector with timeout and resource management"""
         try:
-            print(f"🔄 Starting {detector_name} detector...")
+            print(f"🔄 Starting {detector_name} detector (lightweight mode)...")
             start_time = current_time()
             
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            if detector_name == 'advanced_unified':
-                # Use the new advanced unified detector
-                module = importlib.import_module("advanced_unified_detector")
+            # Set timeout based on detector type (shorter for lightweight)
+            timeout_seconds = {
+                'safe': 30,              # 30 seconds for safe detector
+                'unified': 60,           # 1 minute for unified detector  
+                'advanced_unified': 90   # 1.5 minutes for advanced detector
+            }.get(detector_name, 30)
+            
+            # Run detector with timeout
+            if detector_name == 'safe':
+                module = importlib.import_module("safe_deepfake_detector")
                 result = module.run(video_path, output_path)
             elif detector_name == 'unified':
-                # Use the unified detector
                 module = importlib.import_module("unified_deepfake_detector")
                 result = module.run(video_path, output_path)
-            elif detector_name == 'safe':
-                # Use the safe detector
-                module = importlib.import_module("safe_deepfake_detector")
+            elif detector_name == 'advanced_unified':
+                module = importlib.import_module("advanced_unified_detector")
                 result = module.run(video_path, output_path)
             else:
                 # Fallback to safe detector
@@ -124,10 +452,23 @@ class AdvancedSmartDeepfakeDetector:
             end_time = current_time()
             execution_time = end_time - start_time
             
+            # Check timeout
+            if execution_time > timeout_seconds:
+                print(f"⏰ {detector_name} detector exceeded timeout ({execution_time:.1f}s > {timeout_seconds}s)")
+                return {
+                    'name': detector_name,
+                    'result': 50.0,
+                    'confidence': 0.1,
+                    'execution_time': execution_time,
+                    'success': False,
+                    'error': 'Timeout exceeded',
+                    'output_file': None
+                }
+            
             # Calculate confidence
             confidence = self.calculate_detector_confidence(result, execution_time, detector_name)
             
-            print(f"✅ {detector_name.capitalize()} detector completed: {result}% (confidence: {confidence:.2f}) in {execution_time:.2f}s")
+            print(f"✅ {detector_name.capitalize()} completed: {result}% (confidence: {confidence:.2f}) in {execution_time:.2f}s")
             
             return {
                 'name': detector_name,
@@ -151,7 +492,7 @@ class AdvancedSmartDeepfakeDetector:
             }
 
     def calculate_detector_confidence(self, result, execution_time, detector_name):
-        """Calculate confidence score for detector result"""
+        """Calculate confidence score optimized for lightweight architecture"""
         base_confidence = self.confidence_weights[detector_name]
         
         # Adjust confidence based on result reasonableness
@@ -160,72 +501,63 @@ class AdvancedSmartDeepfakeDetector:
         else:
             result_confidence = 0.5
         
-        # Adjust confidence based on execution time
-        if detector_name == 'advanced_unified' and 30 <= execution_time <= 300:
-            time_confidence = 1.0
-        elif detector_name == 'unified' and 15 <= execution_time <= 180:
-            time_confidence = 1.0
-        elif detector_name == 'safe' and 5 <= execution_time <= 60:
+        # Adjust confidence based on execution time (faster = better for lightweight)
+        if detector_name == 'safe' and execution_time <= 15:
+            time_confidence = 1.2  # Bonus for fast safe detection
+        elif detector_name == 'unified' and execution_time <= 30:
+            time_confidence = 1.1
+        elif detector_name == 'advanced_unified' and execution_time <= 60:
             time_confidence = 1.0
         else:
-            time_confidence = 0.7
+            time_confidence = 0.8  # Penalty for slow execution
         
-        return base_confidence * result_confidence * time_confidence
+        return min(1.0, base_confidence * result_confidence * time_confidence)
     
-    def run_parallel_detection(self, video_path, base_output_path):
-        """Run selected detectors in parallel with proper file management"""
-        print("🚀 Starting advanced smart parallel detection...")
+    def run_lightweight_detection(self, video_path, base_output_path):
+        """Run lightweight detection prioritizing speed and efficiency"""
+        print("🚀 Starting LIGHTWEIGHT smart detection...")
         
         detection_results = []
         
-        # Create output paths for each detector
+        # Create output paths
         output_paths = {
-            'advanced_unified': f"{base_output_path}_advanced_unified.mp4",
+            'safe': f"{base_output_path}_safe.mp4",
             'unified': f"{base_output_path}_unified.mp4", 
-            'safe': f"{base_output_path}_safe.mp4"
+            'advanced_unified': f"{base_output_path}_advanced_unified.mp4"
         }
         
-        # Use advanced detectors with fallbacks
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            futures = {
-                executor.submit(self.run_detector_safely, 'advanced_unified', video_path, output_paths['advanced_unified']): 'advanced_unified',
-                executor.submit(self.run_detector_safely, 'unified', video_path, output_paths['unified']): 'unified',
-                executor.submit(self.run_detector_safely, 'safe', video_path, output_paths['safe']): 'safe'
-            }
+        # LIGHTWEIGHT STRATEGY: Run detectors sequentially, stop early if confident
+        detector_order = ['safe', 'unified', 'advanced_unified']  # Order by speed/reliability
+        
+        for detector_name in detector_order:
+            result = self.run_detector_safely(detector_name, video_path, output_paths[detector_name])
+            detection_results.append(result)
             
-            # Collect results with longer timeout for advanced models
-            for future in concurrent.futures.as_completed(futures, timeout=360):  # 6 minutes
-                try:
-                    result = future.result(timeout=60)  # 1 minute per result
-                    detection_results.append(result)
-                except concurrent.futures.TimeoutError:
-                    detector_name = futures[future]
-                    print(f"⏰ {detector_name.capitalize()} detector timed out")
-                    detection_results.append({
-                        'name': detector_name,
-                        'result': 45.0,
-                        'confidence': 0.1,
-                        'success': False,
-                        'error': 'Timeout',
-                        'output_file': output_paths[detector_name]
-                    })
-                except Exception as e:
-                    detector_name = futures[future]
-                    print(f"💥 {detector_name.capitalize()} detector exception: {e}")
-                    detection_results.append({
-                        'name': detector_name,
-                        'result': 45.0,
-                        'confidence': 0.1,
-                        'success': False,
-                        'error': str(e),
-                        'output_file': output_paths[detector_name]
-                    })
+            # EARLY STOPPING: If safe detector is very confident, skip others
+            if (detector_name == 'safe' and result['success'] and 
+                result['confidence'] > 0.8 and 
+                (result['result'] < 20 or result['result'] > 80)):
+                
+                print(f"🎯 Early stopping: Safe detector very confident ({result['result']:.1f}%, confidence: {result['confidence']:.2f})")
+                
+                # Create dummy results for skipped detectors
+                for skipped_detector in detector_order[1:]:
+                    if skipped_detector != detector_name:
+                        detection_results.append({
+                            'name': skipped_detector,
+                            'result': result['result'],  # Use safe detector result
+                            'confidence': 0.1,  # Low confidence since skipped
+                            'success': False,
+                            'error': 'Skipped due to early stopping',
+                            'output_file': output_paths[skipped_detector]
+                        })
+                break
         
         return self.combine_detection_results(detection_results, base_output_path, output_paths)
     
     def combine_detection_results(self, results, base_output_path, output_paths):
-        """Intelligently combine results from multiple detectors"""
-        print("🧠 Combining detection results using advanced intelligent weighting...")
+        """Lightweight result combination prioritizing safe detector"""
+        print("🧠 Combining results (lightweight mode)...")
         
         successful_results = [r for r in results if r['success']]
         
@@ -233,53 +565,44 @@ class AdvancedSmartDeepfakeDetector:
             print("❌ All detectors failed, using default values")
             return 35.0, self.create_failure_summary(results), output_paths
         
-        # Calculate weighted average with emphasis on advanced models
-        total_weighted_score = 0
-        total_confidence = 0
+        # LIGHTWEIGHT STRATEGY: Prioritize safe detector heavily
+        safe_result = next((r for r in successful_results if r['name'] == 'safe'), None)
         
-        for result in successful_results:
-            weight = result['confidence']
-            
-            # Bonus weight for advanced detector
-            if result['name'] == 'advanced_unified':
-                weight *= 1.5  # 50% bonus for advanced unified
-            
-            total_weighted_score += result['result'] * weight
-            total_confidence += weight
-        
-        if total_confidence > 0:
-            final_score = total_weighted_score / total_confidence
+        if safe_result and safe_result['confidence'] > 0.6:
+            # Trust safe detector if confident
+            final_score = safe_result['result']
+            print(f"🎯 Using safe detector result: {final_score:.1f}% (high confidence)")
         else:
-            final_score = np.mean([r['result'] for r in successful_results])
+            # Weighted average with safe detector priority
+            total_weighted_score = 0
+            total_confidence = 0
+            
+            for result in successful_results:
+                weight = result['confidence']
+                
+                # Extra weight for safe detector in lightweight mode
+                if result['name'] == 'safe':
+                    weight *= 2.0
+                
+                total_weighted_score += result['result'] * weight
+                total_confidence += weight
+            
+            final_score = total_weighted_score / total_confidence if total_confidence > 0 else 50.0
         
-        # Apply consensus adjustment
-        scores = [r['result'] for r in successful_results]
-        if len(scores) >= 2:
-            score_std = np.std(scores)
-            if score_std > 25:
-                # If high variance, trust the advanced model more
-                advanced_results = [r for r in successful_results if r['name'] == 'advanced_unified']
-                if advanced_results:
-                    final_score = 0.7 * advanced_results[0]['result'] + 0.3 * np.median(scores)
-                    print(f"⚠️ High variance detected ({score_std:.1f}), emphasizing advanced model")
-                else:
-                    final_score = np.median(scores)
-                    print(f"⚠️ High variance detected ({score_std:.1f}), using median: {final_score:.1f}")
+        # Create lightweight analysis summary
+        analysis_summary = self.create_lightweight_analysis_summary(results, final_score)
         
-        # Create detailed analysis summary
-        analysis_summary = self.create_advanced_analysis_summary(results, final_score)
-        
-        print(f"🎯 Final advanced combined result: {final_score:.1f}%")
+        print(f"🎯 Final lightweight result: {final_score:.1f}%")
         print(f"📊 Based on {len(successful_results)}/{len(results)} successful detections")
         
         return min(95, max(5, final_score)), analysis_summary, output_paths
     
-    def create_advanced_analysis_summary(self, results, final_score):
-        """Create detailed advanced analysis summary"""
+    def create_lightweight_analysis_summary(self, results, final_score):
+        """Create lightweight analysis summary"""
         summary = {
             'final_score': final_score,
             'detector_results': {},
-            'consensus_level': 'unknown',
+            'consensus_level': 'lightweight',
             'recommendation': 'unknown',
             'advanced_features': {
                 'cnn_analysis': False,
@@ -287,12 +610,11 @@ class AdvancedSmartDeepfakeDetector:
                 'dcgan_analysis': False,
                 'thermal_mapping': False,
                 'enhanced_landmarks': False
-            }
+            },
+            'lightweight_mode': True
         }
         
-        successful_count = 0
-        successful_scores = []
-        has_advanced = False
+        successful_count = sum(1 for r in results if r['success'])
         
         for result in results:
             detector_name = result['name']
@@ -303,53 +625,27 @@ class AdvancedSmartDeepfakeDetector:
                 'execution_time': result.get('execution_time', 0),
                 'error': result.get('error', None) if not result['success'] else None
             }
-            
-            if result['success']:
-                successful_count += 1
-                successful_scores.append(result['result'])
-                
-                # Check for advanced features
-                if detector_name == 'advanced_unified':
-                    has_advanced = True
-                    summary['advanced_features'] = {
-                        'cnn_analysis': True,
-                        'temporal_analysis': True,
-                        'dcgan_analysis': True,
-                        'thermal_mapping': True,
-                        'enhanced_landmarks': True
-                    }
         
-        # Determine consensus level
+        # Simple consensus determination
         if successful_count >= 2:
-            score_variance = np.var(successful_scores) if len(successful_scores) > 1 else 0
-            if has_advanced and score_variance < 100:
-                summary['consensus_level'] = 'high'
-            elif score_variance < 200:
-                summary['consensus_level'] = 'medium'
-            else:
-                summary['consensus_level'] = 'low'
+            summary['consensus_level'] = 'medium'
         elif successful_count == 1:
-            if has_advanced:
-                summary['consensus_level'] = 'single_advanced'
-            else:
-                summary['consensus_level'] = 'single'
+            summary['consensus_level'] = 'single'
         else:
             summary['consensus_level'] = 'failed'
         
-        # Generate advanced recommendation
-        if final_score > 75:
+        # Simple recommendation
+        if final_score > 70:
             summary['recommendation'] = 'high_risk'
-        elif final_score > 50:
+        elif final_score > 40:
             summary['recommendation'] = 'moderate_risk'
-        elif final_score > 25:
-            summary['recommendation'] = 'low_risk'
         else:
-            summary['recommendation'] = 'authentic'
+            summary['recommendation'] = 'low_risk'
         
         return summary
     
     def create_failure_summary(self, results):
-        """Create summary when all detectors fail"""
+        """Create failure summary for lightweight mode"""
         return {
             'final_score': 35.0,
             'detector_results': {r['name']: {'success': False, 'error': r.get('error', 'Unknown')} for r in results},
@@ -361,7 +657,8 @@ class AdvancedSmartDeepfakeDetector:
                 'dcgan_analysis': False,
                 'thermal_mapping': False,
                 'enhanced_landmarks': False
-            }
+            },
+            'lightweight_mode': True
         }
 
 @app.route('/')
@@ -374,7 +671,7 @@ def about():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    """FIXED: Handle file upload with proper video management"""
+    """LIGHTWEIGHT: Handle file upload with aggressive cleanup"""
     try:
         if 'file' not in request.files:
             flash('No file selected')
@@ -398,6 +695,11 @@ def upload_file():
             # Generate unique identifiers
             timestamp = int(current_time())
             
+            # AGGRESSIVE PRE-UPLOAD CLEANUP
+            print("🧹 AGGRESSIVE pre-upload cleanup...")
+            pattern_result = cleanup_processed_files_by_pattern(app.config['UPLOAD_FOLDER'])
+            aggressive_result = aggressive_cleanup_old_videos(app.config['UPLOAD_FOLDER'])
+            
             # Save original video
             original_filename = f"uploaded_video_{timestamp}.mp4"
             original_video_path = os.path.join(app.config['UPLOAD_FOLDER'], original_filename)
@@ -411,19 +713,18 @@ def upload_file():
             base_output_path = os.path.join(app.config['UPLOAD_FOLDER'], processed_filename_base)
 
             try:
-                print(f"🎬 Starting advanced intelligent deepfake detection for: {original_video_path}")
+                print(f"🎬 Starting LIGHTWEIGHT deepfake detection for: {original_video_path}")
                 
-                # Initialize advanced smart detector
-                smart_detector = AdvancedSmartDeepfakeDetector()
+                # Initialize lightweight detector
+                lightweight_detector = LightweightSmartDeepfakeDetector()
                 
-                # Run parallel detection with advanced models
-                final_score, analysis_summary, output_paths = smart_detector.run_parallel_detection(
+                # Run lightweight detection
+                final_score, analysis_summary, output_paths = lightweight_detector.run_lightweight_detection(
                     original_video_path, base_output_path
                 )
                 
-                print(f"🎯 Advanced smart detection result: {final_score:.1f}%")
+                print(f"🎯 Lightweight detection result: {final_score:.1f}%")
                 print(f"📊 Consensus level: {analysis_summary['consensus_level']}")
-                print(f"🔬 Advanced features used: {sum(analysis_summary['advanced_features'].values())}/5")
                 
                 # Verify processed videos exist and create fallbacks if needed
                 verified_output_paths = {}
@@ -432,8 +733,8 @@ def upload_file():
                         verified_output_paths[detector_name] = output_path
                         print(f"✅ {detector_name} video: {os.path.getsize(output_path):,} bytes")
                     else:
-                        # Create fallback by copying original
-                        print(f"⚠️ Creating fallback for {detector_name}")
+                        # Create lightweight fallback (just copy original)
+                        print(f"⚠️ Creating lightweight fallback for {detector_name}")
                         try:
                             shutil.copy2(original_video_path, output_path)
                             verified_output_paths[detector_name] = output_path
@@ -442,8 +743,13 @@ def upload_file():
                             print(f"❌ Fallback failed for {detector_name}: {e}")
                             verified_output_paths[detector_name] = original_video_path
                 
+                # IMMEDIATE POST-PROCESSING CLEANUP
+                current_session_files = get_current_session_files(timestamp)
+                print("🧹 Immediate post-processing cleanup...")
+                aggressive_cleanup_old_videos(app.config['UPLOAD_FOLDER'], current_session_files)
+                
             except Exception as e:
-                print(f"💥 Error in advanced deepfake detection: {e}")
+                print(f"💥 Error in lightweight detection: {e}")
                 traceback.print_exc()
                 
                 # Emergency fallback
@@ -452,16 +758,17 @@ def upload_file():
                     'recommendation': 'system_error', 
                     'consensus_level': 'failed',
                     'advanced_features': {k: False for k in ['cnn_analysis', 'temporal_analysis', 'dcgan_analysis', 'thermal_mapping', 'enhanced_landmarks']},
-                    'detector_results': {}
+                    'detector_results': {},
+                    'lightweight_mode': True
                 }
                 verified_output_paths = {
-                    'advanced_unified': original_video_path,
+                    'safe': original_video_path,
                     'unified': original_video_path,
-                    'safe': original_video_path
+                    'advanced_unified': original_video_path
                 }
                 flash('Video processed with limited analysis due to processing error')
 
-            # Create comprehensive video information
+            # Create lightweight video information
             video_info = {
                 'name': file.filename,
                 'size': f"{os.path.getsize(original_video_path) / (1024*1024):.2f} MB",
@@ -469,47 +776,45 @@ def upload_file():
                 'source': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
                 'deepfake_percentage': final_score,
                 'analysis_summary': analysis_summary,
-                'detection_method': 'Advanced Multi-Model AI Detection',
+                'detection_method': 'Lightweight AI Detection',
+                'timestamp': timestamp,
                 
                 # Video URLs
                 'original_video_url': url_for('serve_video', filename=original_filename),
                 'processed_videos': {
-                    'advanced_unified': {
-                        'url': url_for('serve_video', filename=os.path.basename(verified_output_paths.get('advanced_unified', original_video_path))),
-                        'score': analysis_summary['detector_results'].get('advanced_unified', {}).get('score', final_score),
-                        'success': analysis_summary['detector_results'].get('advanced_unified', {}).get('success', False)
+                    'safe': {
+                        'url': url_for('serve_video', filename=os.path.basename(verified_output_paths.get('safe', original_video_path))),
+                        'score': analysis_summary['detector_results'].get('safe', {}).get('score', final_score),
+                        'success': analysis_summary['detector_results'].get('safe', {}).get('success', False)
                     },
                     'unified': {
                         'url': url_for('serve_video', filename=os.path.basename(verified_output_paths.get('unified', original_video_path))),
                         'score': analysis_summary['detector_results'].get('unified', {}).get('score', final_score),
                         'success': analysis_summary['detector_results'].get('unified', {}).get('success', False)
                     },
-                    'safe': {
-                        'url': url_for('serve_video', filename=os.path.basename(verified_output_paths.get('safe', original_video_path))),
-                        'score': analysis_summary['detector_results'].get('safe', {}).get('score', final_score),
-                        'success': analysis_summary['detector_results'].get('safe', {}).get('success', False)
+                    'advanced_unified': {
+                        'url': url_for('serve_video', filename=os.path.basename(verified_output_paths.get('advanced_unified', original_video_path))),
+                        'score': analysis_summary['detector_results'].get('advanced_unified', {}).get('score', final_score),
+                        'success': analysis_summary['detector_results'].get('advanced_unified', {}).get('success', False)
                     }
                 }
             }
 
             video_info_json = json.dumps(video_info, default=str)
             
-            print(f"🔗 Video URLs generated:")
-            print(f"   Original: {video_info['original_video_url']}")
-            for detector, info in video_info['processed_videos'].items():
-                print(f"   {detector}: {info['url']} (score: {info['score']:.1f}%)")
-
+            print(f"🔗 Lightweight video URLs generated")
+            
             return redirect(url_for('result', video_info=video_info_json))
 
     except Exception as e:
-        print(f"💥 Error in upload_file: {e}")
+        print(f"💥 Error in lightweight upload: {e}")
         traceback.print_exc()
         flash('An error occurred while processing your request')
         return redirect(url_for('index'))
 
 @app.route('/result')
 def result():
-    """ENHANCED: Display results with pre-calculated values"""
+    """LIGHTWEIGHT: Display results with minimal resource usage"""
     try:
         video_info_json = request.args.get('video_info')
         
@@ -519,25 +824,18 @@ def result():
 
         video_info = json.loads(video_info_json)
         
-        # PRE-CALCULATE values to avoid template issues
+        # PRE-CALCULATE lightweight values
         if 'analysis_summary' in video_info and 'advanced_features' in video_info['analysis_summary']:
             advanced_features = video_info['analysis_summary']['advanced_features']
-            
-            # Count active features
             video_info['advanced_features_count'] = sum(1 for value in advanced_features.values() if value is True)
             video_info['total_features'] = len(advanced_features)
-            
-            # Calculate feature percentage
-            if video_info['total_features'] > 0:
-                video_info['features_percentage'] = (video_info['advanced_features_count'] / video_info['total_features']) * 100
-            else:
-                video_info['features_percentage'] = 0
+            video_info['features_percentage'] = (video_info['advanced_features_count'] / video_info['total_features']) * 100 if video_info['total_features'] > 0 else 0
         else:
             video_info['advanced_features_count'] = 0
             video_info['total_features'] = 5
             video_info['features_percentage'] = 0
         
-        # Verify videos exist and add file info
+        # Verify videos exist (lightweight check)
         video_info['videos_exist'] = {}
         video_info['video_file_info'] = {}
         
@@ -555,7 +853,7 @@ def result():
                 'readable': True
             }
         
-        # Check processed videos
+        # Check processed videos (lightweight)
         for detector_name, video_data in video_info['processed_videos'].items():
             filename = video_data['url'].split('/')[-1]
             filepath = os.path.join('static', 'videos', filename)
@@ -569,8 +867,6 @@ def result():
                     'size_mb': f"{file_size / (1024*1024):.2f} MB",
                     'readable': True
                 }
-                
-                # Add file size to processed video info
                 video_info['processed_videos'][detector_name]['file_size'] = f"{file_size / (1024*1024):.2f} MB"
             else:
                 video_info['video_file_info'][detector_name] = {
@@ -580,17 +876,18 @@ def result():
                 }
                 video_info['processed_videos'][detector_name]['file_size'] = "N/A"
         
-        # Add summary statistics
+        # Add lightweight summary statistics
         successful_detectors = [name for name, data in video_info['analysis_summary']['detector_results'].items() if data['success']]
         video_info['summary_stats'] = {
             'successful_detectors': len(successful_detectors),
             'total_detectors': len(video_info['analysis_summary']['detector_results']),
             'success_rate': (len(successful_detectors) / len(video_info['analysis_summary']['detector_results'])) * 100 if video_info['analysis_summary']['detector_results'] else 0,
             'consensus_quality': video_info['analysis_summary']['consensus_level'],
-            'recommendation': video_info['analysis_summary']['recommendation']
+            'recommendation': video_info['analysis_summary']['recommendation'],
+            'lightweight_mode': video_info['analysis_summary'].get('lightweight_mode', False)
         }
         
-        # Add risk assessment
+        # Add simple risk assessment
         score = video_info['deepfake_percentage']
         if score > 75:
             video_info['risk_level'] = {'level': 'HIGH', 'color': '#e74c3c', 'description': 'Strong indication of deepfake content'}
@@ -601,16 +898,12 @@ def result():
         else:
             video_info['risk_level'] = {'level': 'MINIMAL', 'color': '#2ecc71', 'description': 'Strong indication of authentic content'}
         
-        print(f"📊 Result page - Enhanced data prepared:")
-        print(f"   Videos exist: {video_info['videos_exist']}")
-        print(f"   Advanced features: {video_info['advanced_features_count']}/{video_info['total_features']}")
-        print(f"   Success rate: {video_info['summary_stats']['success_rate']:.1f}%")
-        print(f"   Risk level: {video_info['risk_level']['level']}")
+        print(f"📊 Lightweight result page prepared")
         
         return render_template('result.html', video_info=video_info)
     
     except Exception as e:
-        print(f"❌ Error in result: {e}")
+        print(f"❌ Error in lightweight result: {e}")
         traceback.print_exc()
         flash('Error displaying results')
         return redirect(url_for('index'))
@@ -622,13 +915,8 @@ def serve_video(filename):
     try:
         video_path = os.path.join('static', 'videos', filename)
         
-        print(f"🎬 Serving video: {filename}")
-        print(f"📁 Full path: {video_path}")
-        print(f"📊 Exists: {os.path.exists(video_path)}")
-        
         if os.path.exists(video_path):
             file_size = os.path.getsize(video_path)
-            print(f"📏 File size: {file_size:,} bytes")
             
             if file_size > 1000:
                 return send_from_directory(
@@ -638,53 +926,114 @@ def serve_video(filename):
                     as_attachment=False
                 )
             else:
-                print(f"❌ File too small: {file_size} bytes")
                 return "Video file is corrupted or too small", 404
         else:
-            print(f"❌ File not found: {video_path}")
             return "Video file not found", 404
             
     except Exception as e:
         print(f"❌ Video serving error: {e}")
         return f"Error serving video: {str(e)}", 500
 
-# Add debug route
+# Enhanced debug routes
 @app.route('/debug/videos')
 def debug_videos():
     """Debug route to see all video files"""
     try:
         videos_dir = os.path.join('static', 'videos')
-        files = []
+        video_files = get_video_files_info(videos_dir)
         
-        if os.path.exists(videos_dir):
-            for filename in os.listdir(videos_dir):
-                if filename.endswith(('.mp4', '.avi', '.mov', '.mkv', '.webm')):
-                    filepath = os.path.join(videos_dir, filename)
-                    file_size = os.path.getsize(filepath)
-                    files.append({
-                        'filename': filename,
-                        'size': file_size,
-                        'url': f'/videos/{filename}',
-                        'readable': file_size > 1000
-                    })
+        total_size_mb = sum(f['size_mb'] for f in video_files)
         
         return jsonify({
             'videos_directory': videos_dir,
-            'files': files,
-            'total_files': len(files)
+            'files': video_files,
+            'total_files': len(video_files),
+            'total_size_mb': round(total_size_mb, 2),
+            'cleanup_config': VIDEO_CLEANUP_CONFIG,
+            'directory_status': {
+                'over_max_files': len(video_files) > VIDEO_CLEANUP_CONFIG['max_videos_total'],
+                'over_max_size': total_size_mb > VIDEO_CLEANUP_CONFIG['max_directory_size_mb'],
+                'has_old_files': any(f['age_minutes'] > VIDEO_CLEANUP_CONFIG['max_age_minutes'] for f in video_files)
+            },
+            'lightweight_mode': True
         })
     
     except Exception as e:
         return jsonify({'error': str(e)})
 
+@app.route('/debug/cleanup')
+def debug_cleanup():
+    """Debug route to manually trigger aggressive cleanup"""
+    try:
+        print("🧹 Manual AGGRESSIVE cleanup triggered via debug route")
+        
+        # Pattern cleanup first
+        pattern_result = cleanup_processed_files_by_pattern(UPLOAD_FOLDER)
+        
+        # Aggressive cleanup
+        cleanup_result = aggressive_cleanup_old_videos(UPLOAD_FOLDER)
+        
+        # Emergency cleanup if needed
+        video_files = get_video_files_info(UPLOAD_FOLDER)
+        total_size_mb = sum(f['size_mb'] for f in video_files)
+        
+        emergency_triggered = False
+        if total_size_mb > VIDEO_CLEANUP_CONFIG['max_directory_size_mb']:
+            emergency_cleanup(UPLOAD_FOLDER)
+            emergency_triggered = True
+        
+        return jsonify({
+            'cleanup_performed': True,
+            'pattern_cleanup': pattern_result,
+            'aggressive_cleanup': cleanup_result,
+            'emergency_cleanup_triggered': emergency_triggered,
+            'message': 'Aggressive cleanup completed successfully',
+            'lightweight_mode': True
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'cleanup_performed': False,
+            'error': str(e),
+            'message': 'Aggressive cleanup failed'
+        })
+
+# Add route for automatic cleanup
+@app.route('/api/auto-cleanup', methods=['POST'])
+def auto_cleanup():
+    """API endpoint for automatic cleanup"""
+    try:
+        pattern_result = cleanup_processed_files_by_pattern(UPLOAD_FOLDER)
+        cleanup_result = aggressive_cleanup_old_videos(UPLOAD_FOLDER)
+        
+        return jsonify({
+            'success': True,
+            'pattern_cleanup': pattern_result,
+            'aggressive_cleanup': cleanup_result,
+            'lightweight_mode': True
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
 if __name__ == '__main__':
-    print("🚀 Starting Deepfake Detector Server...")
+    print("🚀 Starting LIGHTWEIGHT Deepfake Detector Server...")
     print(f"📁 Upload folder: {UPLOAD_FOLDER}")
-    print(f"📁 Processed folder: {PROCESSED_FOLDER}")
+    print(f"🧹 Aggressive cleanup enabled: {VIDEO_CLEANUP_CONFIG['cleanup_on_upload']}")
+    print(f"📊 Max total videos: {VIDEO_CLEANUP_CONFIG['max_videos_total']}")
+    print(f"💾 Max directory size: {VIDEO_CLEANUP_CONFIG['max_directory_size_mb']} MB")
+    print(f"⏰ Max age: {VIDEO_CLEANUP_CONFIG['max_age_minutes']} minutes")
+    print(f"🎯 Lightweight mode: ON")
     
     # Create directories if they don't exist
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+    
+    # Perform aggressive startup cleanup
+    if VIDEO_CLEANUP_CONFIG['cleanup_on_startup']:
+        cleanup_on_startup()
     
     # Use different port to avoid conflicts
     app.run(debug=True, host='0.0.0.0', port=5001)
