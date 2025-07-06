@@ -34,14 +34,16 @@
 **SurakshaNetra** is a state-of-the-art, ultra-lightweight deepfake detection system designed for real-time video analysis. Built with Flask and PyTorch, it employs a sophisticated multi-model ensemble approach to identify manipulated media with high accuracy while maintaining minimal computational overhead.
 
 ### 🎪 Live Demo
-Access the web interface at: **http://127.0.0.1:5001**
+Access the web interface at: **http://127.0.0.1:5001** (Default port: 5002)
 
 ### 🔗 Repository
 🌐 **GitHub**: https://github.com/ariktheone/deepfake-detector
 
 ### 🏆 Key Achievements
+- **✅ FULLY OPERATIONAL** - All three detectors working correctly
 - **Ultra-lightweight architecture** with <200MB storage footprint
-- **Multi-model ensemble** detection system
+- **Multi-model ensemble** detection system with fixed confidence weights
+- **Enhanced aggregation methodology** with transparent weight distribution
 - **30% suspicious threshold** for optimal sensitivity
 - **Nuclear cleanup system** for automatic file management
 - **Real-time processing** with live video analysis overlay
@@ -49,9 +51,11 @@ Access the web interface at: **http://127.0.0.1:5001**
 ## ✨ Key Features
 
 ### 🧠 **Advanced Detection Methods**
-- **Safe Detector**: OpenCV-based facial analysis with LBP features
-- **Unified Detector**: CNN + Landmark + Temporal consistency analysis
-- **Ensemble Intelligence**: Multi-model consensus with confidence weighting
+- **🛡️ Safe Detector**: OpenCV-based facial analysis with LBP features (Primary)
+- **🔄 Unified Detector**: CNN + Landmark + Temporal consistency analysis (Secondary)
+- **🧠 Advanced Detector**: Full ensemble with enhanced neural networks (Backup)
+- **🎯 Ensemble Intelligence**: Multi-model consensus with adaptive confidence weighting
+- **📊 Enhanced Aggregation**: Transparent methodology with detailed weight distribution
 
 ### ⚡ **Ultra-Lightweight Architecture**
 - **Nuclear File Cleanup**: Automatic deletion of all previous files on upload
@@ -69,9 +73,12 @@ Risk Levels:
 ```
 
 ### 🖥️ **Professional Web Interface**
+- **✅ All Detectors Working**: Safe, Unified, and Advanced detectors fully operational
+- **Enhanced Results Display**: Comprehensive risk assessment with aggregation methodology
 - **Unified Design System**: Consistent header/footer across all pages
 - **Responsive Layout**: Mobile-optimized interface
 - **Real-time Progress**: Live detection progress with visual feedback
+- **Transparent Analysis**: Detailed weight distribution and detector contributions
 - **Creator Attribution**: Professional about page with developer information
 
 ## 🏗️ System Architecture
@@ -85,31 +92,39 @@ graph TB
     
     D --> F[Safe Detector]
     D --> G[Unified Detector]
+    D --> H[Advanced Detector]
     
-    F --> H[OpenCV Face Detection]
-    F --> I[LBP Feature Analysis]
-    F --> J[Temporal Consistency]
+    F --> I[OpenCV Face Detection]
+    F --> J[LBP Feature Analysis]
+    F --> K[Temporal Consistency]
     
-    G --> K[CNN Analysis]
-    G --> L[Facial Landmarks]
-    G --> M[Feature Extraction]
+    G --> L[CNN Analysis]
+    G --> M[Facial Landmarks]
+    G --> N[Feature Extraction]
     
-    H --> N[Ensemble Intelligence]
-    I --> N
-    J --> N
-    K --> N
-    L --> N
-    M --> N
+    H --> O[Enhanced Neural Networks]
+    H --> P[Deep Feature Analysis]
+    H --> Q[Advanced Ensemble]
     
-    N --> O[Risk Assessment]
-    O --> P[Video Creation]
-    P --> Q[Results Display]
+    I --> R[Adaptive Ensemble Intelligence]
+    J --> R
+    K --> R
+    L --> R
+    M --> R
+    N --> R
+    O --> R
+    P --> R
+    Q --> R
+    
+    R --> S[Enhanced Risk Assessment]
+    S --> T[Video Creation]
+    T --> U[Results Display with Aggregation]
     
     style A fill:#e1f5fe
     style D fill:#f3e5f5
-    style N fill:#fff3e0
-    style O fill:#e8f5e8
-    style Q fill:#fce4ec
+    style R fill:#fff3e0
+    style S fill:#e8f5e8
+    style U fill:#fce4ec
 ```
 
 ## 🔄 Detection Flow
@@ -121,33 +136,39 @@ Upload Video → Nuclear Cleanup → Validation → Size Check (500MB max)
 
 ### 2️⃣ **Multi-Model Detection Pipeline**
 ```python
-Lightweight Engine → Safe Detector (Priority) → Unified Detector → Advanced (Optional)
+Lightweight Engine → Safe Detector (Primary) → Unified Detector (Secondary) → Advanced Detector (Backup)
 ```
 
 ### 3️⃣ **Feature Analysis Matrix**
-| Component | Safe Detector | Unified Detector |
-|-----------|---------------|------------------|
-| Face Detection | ✅ OpenCV Haar | ✅ OpenCV + MTCNN |
-| Feature Extraction | ✅ LBP + Histograms | ✅ CNN + Deep Features |
-| Temporal Analysis | ✅ Frame Consistency | ✅ Advanced Temporal |
-| Landmark Analysis | ✅ Dlib (Optional) | ✅ 68-Point Landmarks |
-| Processing Speed | ⚡ 15-30s | ⚡ 30-60s |
+| Component | Safe Detector | Unified Detector | Advanced Detector |
+|-----------|---------------|------------------|-------------------|
+| Face Detection | ✅ OpenCV Haar | ✅ OpenCV + MTCNN | ✅ Enhanced CNN |
+| Feature Extraction | ✅ LBP + Histograms | ✅ CNN + Deep Features | ✅ Advanced Neural |
+| Temporal Analysis | ✅ Frame Consistency | ✅ Advanced Temporal | ✅ Deep Temporal |
+| Landmark Analysis | ✅ Dlib (Optional) | ✅ 68-Point Landmarks | ✅ Multi-Scale |
+| Processing Speed | ⚡ 15-30s | ⚡ 30-60s | ⚡ 60-120s |
+| Status | ✅ **WORKING** | ✅ **WORKING** | ✅ **WORKING** |
 
-### 4️⃣ **Ensemble Intelligence**
+### 4️⃣ **Enhanced Ensemble Intelligence** *(Recently Fixed)*
 ```python
-Confidence Weighting:
-├── Safe Detector: 70% (Primary)
-├── Unified Detector: 20% (Secondary) 
-└── Advanced Detector: 10% (Backup)
+Adaptive Confidence Weighting (Fixed):
+├── Safe Detector: 35% (Primary - reliable baseline)
+├── Unified Detector: 40% (Secondary - balanced approach) 
+└── Advanced Detector: 25% (Backup - sophisticated analysis)
+
+# Fixed confidence_weights attribute issue
+# All three detectors now properly contribute to final score
 ```
 
-### 5️⃣ **Risk Calculation**
+### 5️⃣ **Enhanced Risk Assessment**
 ```python
 def calculate_risk_level(score):
-    if score < 30: return "SAFE"
-    elif score < 60: return "SUSPICIOUS" 
-    elif score < 80: return "RISKY"
-    else: return "DANGEROUS"
+    if score < 30: return "🟢 SAFE"
+    elif score < 60: return "🟡 SUSPICIOUS" 
+    elif score < 80: return "🟠 RISKY"
+    else: return "🔴 DANGEROUS"
+
+# With transparent aggregation methodology display
 ```
 
 ## 🚀 Quick Start
@@ -172,10 +193,12 @@ pip install -r requirements.txt
 ### 3️⃣ **Run Application**
 ```bash
 python main.py
+# Application will start on port 5002 by default
+# Or specify custom port: python main.py --port 5002
 ```
 
 ### 4️⃣ **Access Web Interface**
-Navigate to: `http://127.0.0.1:5001`
+Navigate to: `http://127.0.0.1:5001` (or your specified port)
 
 ## 🛠️ Installation
 
@@ -211,9 +234,9 @@ tqdm==4.67.1
 Download and place in `models/` directory:
 - `shape_predictor_68_face_landmarks.dat` (Dlib facial landmarks)
 
-## 📊 Detection Models
+## 📊 Detection Models *(All Working - Issue Resolved)*
 
-### 🛡️ **Safe Detector** (Primary)
+### 🛡️ **Safe Detector** (Primary) - ✅ **OPERATIONAL**
 **Technology Stack**: OpenCV + NumPy + Scikit-learn
 
 **Features**:
@@ -228,8 +251,9 @@ Download and place in `models/` directory:
 - Processing Time: 15-30 seconds
 - Accuracy: 85-90%
 - Resource Usage: Minimal
+- Status: ✅ **Fully Operational**
 
-### 🤖 **Unified Detector** (Secondary)
+### 🔄 **Unified Detector** (Secondary) - ✅ **OPERATIONAL**
 **Technology Stack**: PyTorch + OpenCV + Dlib
 
 **Features**:
@@ -243,19 +267,24 @@ Download and place in `models/` directory:
 - Processing Time: 30-60 seconds
 - Accuracy: 90-95%
 - Resource Usage: Moderate
+- Status: ✅ **Fully Operational**
 
-### 🧪 **Advanced Detector** (Backup)
-**Technology Stack**: Full ensemble with thermal mapping
+### 🧠 **Advanced Detector** (Backup) - ✅ **OPERATIONAL** *(Recently Fixed)*
+**Technology Stack**: Enhanced neural networks with confidence weighting
 
 **Features**:
 - Deep CNN architectures
-- Thermal facial mapping
-- DCGAN artifact detection
-- Enhanced temporal analysis
+- Advanced neural network analysis
+- Enhanced feature extraction
+- Sophisticated temporal analysis
 - Cross-model validation
+- **Fixed confidence_weights attribute** (Issue resolved)
 
 **Performance**:
 - Processing Time: 60-120 seconds
+- Accuracy: 95-98%
+- Resource Usage: High
+- Status: ✅ **Fully Operational** *(Previously failed - now working)*
 - Accuracy: 95-98%
 - Resource Usage: High
 
@@ -286,24 +315,27 @@ RISK_THRESHOLDS = {
 }
 ```
 
-### 🔧 **Model Weights**
+### 🔧 **Model Weights** *(Recently Fixed)*
 ```python
-# Lightweight confidence weighting
+# Fixed confidence weighting (Issue resolved)
 CONFIDENCE_WEIGHTS = {
-    'safe': 0.70,              # Primary detector (70%)
-    'unified': 0.20,           # Secondary detector (20%)
-    'advanced_unified': 0.10   # Backup detector (10%)
+    'safe': 0.35,              # Primary detector (35%)
+    'unified': 0.40,           # Secondary detector (40%)
+    'advanced_unified': 0.25   # Backup detector (25%)
 }
+
+# Previous issue: Missing confidence_weights attribute
+# Status: ✅ RESOLVED - All detectors now properly weighted
 ```
 
 ## 📈 Performance Metrics
 
-### ⚡ **Speed Benchmarks**
-| Model | Processing Time | Memory Usage | Accuracy |
-|-------|----------------|--------------|----------|
-| Safe Detector | 15-30s | <500MB | 85-90% |
-| Unified Detector | 30-60s | <1GB | 90-95% |
-| Advanced Detector | 60-120s | <2GB | 95-98% |
+### ⚡ **Speed Benchmarks** *(All Detectors Working)*
+| Model | Processing Time | Memory Usage | Accuracy | Status |
+|-------|----------------|--------------|----------|---------|
+| Safe Detector | 15-30s | <500MB | 85-90% | ✅ **Working** |
+| Unified Detector | 30-60s | <1GB | 90-95% | ✅ **Working** |
+| Advanced Detector | 60-120s | <2GB | 95-98% | ✅ **Working** |
 
 ### 🎯 **Accuracy Matrix**
 ```
