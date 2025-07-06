@@ -85,28 +85,28 @@ Risk Levels:
 
 ```mermaid
 graph TB
-    A[Video Upload] --> B[Nuclear Cleanup]
-    B --> C{File Validation}
-    C -->|Valid| D[Lightweight Detection Engine]
-    C -->|Invalid| E[Error Handler]
+    A[🎬 Video Upload] --> B[🧹 Nuclear Cleanup]
+    B --> C{📋 File Validation}
+    C -->|✅ Valid| D[⚡ Lightweight Detection Engine]
+    C -->|❌ Invalid| E[🚨 Error Handler]
     
-    D --> F[Safe Detector]
-    D --> G[Unified Detector]
-    D --> H[Advanced Detector]
+    D --> F[🛡️ Safe Detector<br/>Primary - 35%]
+    D --> G[🔄 Unified Detector<br/>Secondary - 40%]
+    D --> H[🧠 Advanced Detector<br/>Backup - 25%]
     
     F --> I[OpenCV Face Detection]
     F --> J[LBP Feature Analysis]
     F --> K[Temporal Consistency]
     
     G --> L[CNN Analysis]
-    G --> M[Facial Landmarks]
-    G --> N[Feature Extraction]
+    G --> M[68-Point Landmarks]
+    G --> N[Deep Feature Extraction]
     
     H --> O[Enhanced Neural Networks]
-    H --> P[Deep Feature Analysis]
-    H --> Q[Advanced Ensemble]
+    H --> P[Advanced Feature Analysis]
+    H --> Q[Sophisticated Ensemble]
     
-    I --> R[Adaptive Ensemble Intelligence]
+    I --> R[🎯 Adaptive Ensemble Intelligence<br/>Fixed Confidence Weights]
     J --> R
     K --> R
     L --> R
@@ -116,15 +116,18 @@ graph TB
     P --> R
     Q --> R
     
-    R --> S[Enhanced Risk Assessment]
-    S --> T[Video Creation]
-    T --> U[Results Display with Aggregation]
+    R --> S[📊 Enhanced Risk Assessment<br/>With Aggregation Methodology]
+    S --> T[🎥 Multi-Video Creation]
+    T --> U[📈 Results Display<br/>All Three Detectors]
     
-    style A fill:#e1f5fe
-    style D fill:#f3e5f5
-    style R fill:#fff3e0
-    style S fill:#e8f5e8
-    style U fill:#fce4ec
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style D fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style F fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    style G fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style H fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style R fill:#fff3e0,stroke:#ff6f00,stroke-width:3px
+    style S fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    style U fill:#fce4ec,stroke:#7b1fa2,stroke-width:2px
 ```
 
 ## 🔄 Detection Flow
@@ -357,10 +360,10 @@ Detection Accuracy by Content Type:
 
 ### 🌐 **Web Routes**
 ```python
-# Application runs on port 5001
-GET  /              # Main upload interface (http://127.0.0.1:5001)
+# Application runs on port 5002 by default
+GET  /              # Main upload interface (http://127.0.0.1:5002)
 POST /upload        # Video upload and processing
-GET  /result/<id>   # Detection results
+GET  /result/<id>   # Detection results with all three detectors
 GET  /about         # About page with creator info
 GET  /static/videos/<file> # Processed video access
 ```
