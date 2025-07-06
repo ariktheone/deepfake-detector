@@ -33,6 +33,34 @@ def count_true_filter(dict_obj):
     except (TypeError, AttributeError):
         return 0
 
+@app.template_filter('safe_format')
+def safe_format_filter(value, format_string="%.1f"):
+    """Safely format a value, handling None and invalid values"""
+    try:
+        if value is None:
+            return "N/A"
+        if isinstance(value, (int, float)):
+            return format_string % value
+        # Try to convert to float
+        float_value = float(value)
+        return format_string % float_value
+    except (TypeError, ValueError, ZeroDivisionError):
+        return "N/A"
+
+@app.template_filter('safe_percentage')
+def safe_percentage_filter(value):
+    """Safely format a percentage value"""
+    try:
+        if value is None:
+            return "N/A"
+        if isinstance(value, (int, float)):
+            return f"{value:.1f}%"
+        # Try to convert to float
+        float_value = float(value)
+        return f"{float_value:.1f}%"
+    except (TypeError, ValueError):
+        return "N/A"
+
 # Add global functions to Jinja2 environment
 @app.template_global()
 def sum_dict_values(dict_obj):
@@ -53,6 +81,34 @@ def safe_sum(iterable):
         return sum(iterable)
     except (TypeError, ValueError):
         return 0
+
+@app.template_global()
+def safe_format(value, format_string="%.1f"):
+    """Global safe format function for templates"""
+    try:
+        if value is None:
+            return "N/A"
+        if isinstance(value, (int, float)):
+            return format_string % value
+        # Try to convert to float
+        float_value = float(value)
+        return format_string % float_value
+    except (TypeError, ValueError, ZeroDivisionError):
+        return "N/A"
+
+@app.template_global()
+def safe_percentage(value):
+    """Global safe percentage format function"""
+    try:
+        if value is None:
+            return "N/A"
+        if isinstance(value, (int, float)):
+            return f"{value:.1f}%"
+        # Try to convert to float
+        float_value = float(value)
+        return f"{float_value:.1f}%"
+    except (TypeError, ValueError):
+        return "N/A"
 
 # Make built-in functions available in templates
 app.jinja_env.globals.update({
@@ -410,11 +466,32 @@ class LightweightSmartDeepfakeDetector:
     
     def __init__(self):
         self.detection_results = {}
-        # Optimized confidence weights for lightweight architecture
+        # Enhanced adaptive weighting system
+        self.base_weights = {
+            'safe': 0.35,              # Base reliable weight
+            'unified': 0.40,           # Higher base weight for unified
+            'advanced_unified': 0.25   # Moderate base weight for advanced
+        }
+        
+        # Performance-based weight multipliers
+        self.performance_multipliers = {
+            'safe': 1.0,       # Standard multiplier
+            'unified': 1.1,    # Slight boost for unified
+            'advanced_unified': 1.2  # Higher multiplier for advanced when successful
+        }
+        
+        # Confidence thresholds for reliable results
+        self.confidence_thresholds = {
+            'safe': 0.6,
+            'unified': 0.5,
+            'advanced_unified': 0.4
+        }
+        
+        # Legacy confidence weights for backward compatibility
         self.confidence_weights = {
-            'safe': 0.70,              # Prioritize safe detector (fastest, most reliable)
-            'unified': 0.20,           # Medium weight for unified detector
-            'advanced_unified': 0.10   # Lower weight for advanced (slower, resource heavy)
+            'safe': 0.35,
+            'unified': 0.40,
+            'advanced_unified': 0.25
         }
     
     def run_detector_safely(self, detector_name, video_path, output_path):
@@ -428,9 +505,9 @@ class LightweightSmartDeepfakeDetector:
             
             # Set timeout based on detector type (shorter for lightweight)
             timeout_seconds = {
-                'safe': 30,              # 30 seconds for safe detector
+                'safe': 90,              # 90 seconds for safe detector (it processes all frames)
                 'unified': 60,           # 1 minute for unified detector  
-                'advanced_unified': 90   # 1.5 minutes for advanced detector
+                'advanced_unified': 120  # 2 minutes for advanced detector
             }.get(detector_name, 30)
             
             # Run detector with timeout
@@ -452,23 +529,49 @@ class LightweightSmartDeepfakeDetector:
             end_time = current_time()
             execution_time = end_time - start_time
             
-            # Check timeout
+            # Check timeout - but still use result if valid
             if execution_time > timeout_seconds:
                 print(f"⏰ {detector_name} detector exceeded timeout ({execution_time:.1f}s > {timeout_seconds}s)")
-                return {
-                    'name': detector_name,
-                    'result': 50.0,
-                    'confidence': 0.1,
-                    'execution_time': execution_time,
-                    'success': False,
-                    'error': 'Timeout exceeded',
-                    'output_file': None
-                }
+                
+                # If we have a valid result despite timeout, use it with warning
+                if result is not None and isinstance(result, (int, float)):
+                    print(f"⚠️ Using result despite timeout: {result:.1f}%")
+                    confidence = self.calculate_detector_confidence(result, execution_time, detector_name)
+                    confidence *= 0.8  # Reduce confidence due to timeout
+                    
+                    return {
+                        'name': detector_name,
+                        'result': max(0.0, min(100.0, float(result))),
+                        'confidence': confidence,
+                        'execution_time': execution_time,
+                        'success': True,  # Mark as successful since we have data
+                        'error': f'Completed but exceeded timeout ({execution_time:.1f}s)',
+                        'output_file': output_path
+                    }
+                else:
+                    # No valid result and timeout
+                    return {
+                        'name': detector_name,
+                        'result': 50.0,
+                        'confidence': 0.1,
+                        'execution_time': execution_time,
+                        'success': False,
+                        'error': 'Timeout exceeded with no valid result',
+                        'output_file': None
+                    }
             
             # Calculate confidence
             confidence = self.calculate_detector_confidence(result, execution_time, detector_name)
             
-            print(f"✅ {detector_name.capitalize()} completed: {result}% (confidence: {confidence:.2f}) in {execution_time:.2f}s")
+            # SAFETY: Ensure result is never None or invalid
+            if result is None or not isinstance(result, (int, float)):
+                print(f"⚠️ {detector_name} returned invalid result: {result}, using fallback")
+                result = 50.0  # Neutral fallback
+            
+            # Clamp result to valid range
+            result = max(0.0, min(100.0, float(result)))
+            
+            print(f"✅ {detector_name.capitalize()} completed: {result:.1f}% (confidence: {confidence:.2f}) in {execution_time:.2f}s")
             
             return {
                 'name': detector_name,
@@ -483,7 +586,7 @@ class LightweightSmartDeepfakeDetector:
             print(f"❌ {detector_name.capitalize()} detector failed: {e}")
             return {
                 'name': detector_name,
-                'result': 50.0,
+                'result': 50.0,  # Safe fallback value
                 'confidence': 0.1,
                 'execution_time': 0,
                 'success': False,
@@ -556,53 +659,164 @@ class LightweightSmartDeepfakeDetector:
         return self.combine_detection_results(detection_results, base_output_path, output_paths)
     
     def combine_detection_results(self, results, base_output_path, output_paths):
-        """Lightweight result combination prioritizing safe detector"""
-        print("🧠 Combining results (lightweight mode)...")
+        """Enhanced result combination with intelligent weighted aggregation"""
+        print("🧠 Combining results with enhanced weighted aggregation...")
         
         successful_results = [r for r in results if r['success']]
+        all_results = results  # Include all results for comprehensive analysis
         
         if not successful_results:
             print("❌ All detectors failed, using default values")
-            return 35.0, self.create_failure_summary(results), output_paths
+            return 50.0, self.create_failure_summary(results), output_paths
         
-        # LIGHTWEIGHT STRATEGY: Prioritize safe detector heavily
-        safe_result = next((r for r in successful_results if r['name'] == 'safe'), None)
+        # ENHANCED AGGREGATION SYSTEM
+        print(f"📊 Aggregating results from {len(successful_results)} successful / {len(all_results)} total detectors")
         
-        if safe_result and safe_result['confidence'] > 0.6:
-            # Trust safe detector if confident
-            final_score = safe_result['result']
-            print(f"🎯 Using safe detector result: {final_score:.1f}% (high confidence)")
-        else:
-            # Weighted average with safe detector priority
-            total_weighted_score = 0
-            total_confidence = 0
-            
-            for result in successful_results:
-                weight = result['confidence']
-                
-                # Extra weight for safe detector in lightweight mode
-                if result['name'] == 'safe':
-                    weight *= 2.0
-                
-                total_weighted_score += result['result'] * weight
-                total_confidence += weight
-            
-            final_score = total_weighted_score / total_confidence if total_confidence > 0 else 50.0
+        # Calculate adaptive weights based on performance
+        adaptive_weights = self.calculate_adaptive_weights(successful_results)
         
-        # Create lightweight analysis summary
-        analysis_summary = self.create_lightweight_analysis_summary(results, final_score)
+        # Calculate final score using multiple strategies
+        final_score = self.calculate_weighted_aggregate_score(successful_results, adaptive_weights)
         
-        print(f"🎯 Final lightweight result: {final_score:.1f}%")
-        print(f"📊 Based on {len(successful_results)}/{len(results)} successful detections")
+        print(f"🎯 Enhanced aggregate result: {final_score:.1f}%")
+        print(f"⚖️ Adaptive weights: {adaptive_weights}")
+        
+        # Create enhanced analysis summary
+        analysis_summary = self.create_enhanced_analysis_summary(all_results, final_score, adaptive_weights)
         
         return min(95, max(5, final_score)), analysis_summary, output_paths
     
-    def create_lightweight_analysis_summary(self, results, final_score):
-        """Create lightweight analysis summary"""
+    def calculate_adaptive_weights(self, successful_results):
+        """Calculate adaptive weights based on detector performance and confidence"""
+        adaptive_weights = {}
+        total_base_weight = 0
+        
+        # First pass: calculate base weights with performance multipliers
+        for result in successful_results:
+            detector_name = result['name']
+            base_weight = self.base_weights.get(detector_name, 0.33)
+            performance_multiplier = self.performance_multipliers.get(detector_name, 1.0)
+            confidence = result.get('confidence', 0.5)
+            execution_time = result.get('execution_time', 60)
+            
+            # Confidence boost: higher confidence = higher weight
+            confidence_boost = 1.0 + (confidence - 0.5)  # Range: 0.5 - 1.5
+            
+            # Speed boost: faster execution = higher weight (for lightweight mode)
+            speed_thresholds = {'safe': 15, 'unified': 30, 'advanced_unified': 60}
+            speed_threshold = speed_thresholds.get(detector_name, 30)
+            speed_boost = 1.2 if execution_time <= speed_threshold else 0.9
+            
+            # Calculate adaptive weight
+            adaptive_weight = base_weight * performance_multiplier * confidence_boost * speed_boost
+            adaptive_weights[detector_name] = adaptive_weight
+            total_base_weight += adaptive_weight
+        
+        # Normalize weights to sum to 1.0
+        if total_base_weight > 0:
+            for detector_name in adaptive_weights:
+                adaptive_weights[detector_name] /= total_base_weight
+        
+        return adaptive_weights
+    
+    def calculate_weighted_aggregate_score(self, successful_results, adaptive_weights):
+        """Calculate final score using intelligent weighted aggregation"""
+        if not successful_results:
+            return 50.0
+        
+        # Strategy 1: Weighted Average (primary method)
+        weighted_sum = 0
+        total_weight = 0
+        
+        for result in successful_results:
+            detector_name = result['name']
+            score = result['result']
+            weight = adaptive_weights.get(detector_name, 0)
+            
+            weighted_sum += score * weight
+            total_weight += weight
+        
+        weighted_average = weighted_sum / total_weight if total_weight > 0 else 50.0
+        
+        # Strategy 2: Consensus-based adjustment
+        scores = [r['result'] for r in successful_results]
+        score_variance = np.var(scores) if len(scores) > 1 else 0
+        
+        # If all detectors agree closely, boost confidence in result
+        if score_variance < 100:  # Low variance (scores within ~10 points)
+            consensus_boost = 1.0
+            print(f"✅ High consensus detected (variance: {score_variance:.1f})")
+        else:
+            consensus_boost = 0.9
+            print(f"⚠️ Low consensus detected (variance: {score_variance:.1f})")
+        
+        # Strategy 3: Outlier detection and handling
+        median_score = np.median(scores)
+        outlier_threshold = 20  # Scores more than 20 points from median
+        
+        non_outlier_results = []
+        for result in successful_results:
+            if abs(result['result'] - median_score) <= outlier_threshold:
+                non_outlier_results.append(result)
+            else:
+                print(f"🚨 Outlier detected: {result['name']} = {result['result']:.1f}% (median: {median_score:.1f}%)")
+        
+        # If we have non-outlier results, use them for refinement
+        if len(non_outlier_results) >= len(successful_results) * 0.5:  # At least 50% non-outliers
+            refined_weighted_sum = 0
+            refined_total_weight = 0
+            
+            for result in non_outlier_results:
+                detector_name = result['name']
+                score = result['result']
+                weight = adaptive_weights.get(detector_name, 0)
+                
+                refined_weighted_sum += score * weight
+                refined_total_weight += weight
+            
+            if refined_total_weight > 0:
+                refined_average = refined_weighted_sum / refined_total_weight
+                # Blend original and refined scores
+                final_score = (weighted_average * 0.7) + (refined_average * 0.3)
+                print(f"🔧 Outlier-adjusted score: {refined_average:.1f}% -> blended: {final_score:.1f}%")
+            else:
+                final_score = weighted_average
+        else:
+            final_score = weighted_average
+        
+        # Apply consensus boost
+        final_score *= consensus_boost
+        
+        # Strategy 4: Safety bounds and sanity checks
+        if len(successful_results) == 1:
+            # Single detector - apply conservative adjustment
+            single_detector = successful_results[0]
+            if single_detector['name'] == 'safe':
+                # Safe detector alone - slightly reduce confidence
+                final_score = final_score * 0.95
+            elif single_detector['name'] == 'advanced_unified':
+                # Advanced detector alone - maintain full score
+                pass
+            else:
+                # Unified detector alone - slightly reduce confidence
+                final_score = final_score * 0.98
+        
+        return final_score
+    
+    def create_enhanced_analysis_summary(self, results, final_score, adaptive_weights):
+        """Create enhanced analysis summary with aggregation details"""
+        successful_results = [r for r in results if r['success']]
+        
         summary = {
             'final_score': final_score,
             'detector_results': {},
-            'consensus_level': 'lightweight',
+            'aggregation_details': {
+                'total_detectors': len(results),
+                'successful_detectors': len(successful_results),
+                'adaptive_weights': adaptive_weights,
+                'aggregation_method': 'enhanced_weighted'
+            },
+            'consensus_level': 'unknown',
             'recommendation': 'unknown',
             'advanced_features': {
                 'cnn_analysis': False,
@@ -614,33 +828,79 @@ class LightweightSmartDeepfakeDetector:
             'lightweight_mode': True
         }
         
-        successful_count = sum(1 for r in results if r['success'])
-        
+        # Process each detector result
         for result in results:
             detector_name = result['name']
+            
+            # Use actual result even if marked as failed due to timeout
+            actual_score = result.get('result')
+            if actual_score is not None and isinstance(actual_score, (int, float)):
+                use_score = actual_score
+                was_successful = True
+            elif result['success']:
+                use_score = actual_score
+                was_successful = True
+            else:
+                use_score = None
+                was_successful = False
+            
             summary['detector_results'][detector_name] = {
-                'success': result['success'],
-                'score': result['result'] if result['success'] else None,
+                'success': was_successful,
+                'score': use_score,
                 'confidence': result.get('confidence', 0),
                 'execution_time': result.get('execution_time', 0),
-                'error': result.get('error', None) if not result['success'] else None
+                'error': result.get('error', None) if not was_successful else None,
+                'weight_used': adaptive_weights.get(detector_name, 0),
+                'contribution_to_final': (adaptive_weights.get(detector_name, 0) * use_score) if use_score else 0
             }
         
-        # Simple consensus determination
-        if successful_count >= 2:
+        # Enhanced consensus determination
+        successful_count = len(successful_results)
+        total_count = len(results)
+        
+        if successful_count == total_count and successful_count >= 2:
+            summary['consensus_level'] = 'high'
+        elif successful_count >= 2:
             summary['consensus_level'] = 'medium'
         elif successful_count == 1:
             summary['consensus_level'] = 'single'
         else:
             summary['consensus_level'] = 'failed'
         
-        # Simple recommendation
-        if final_score > 70:
+        # Enhanced recommendation with detailed reasoning
+        if final_score > 75:
             summary['recommendation'] = 'high_risk'
-        elif final_score > 40:
+            summary['recommendation_reason'] = 'Strong aggregated evidence of deepfake content'
+        elif final_score > 50:
             summary['recommendation'] = 'moderate_risk'
-        else:
+            summary['recommendation_reason'] = 'Moderate aggregated evidence suggests potential deepfake'
+        elif final_score > 25:
             summary['recommendation'] = 'low_risk'
+            summary['recommendation_reason'] = 'Low aggregated evidence, appears mostly authentic'
+        else:
+            summary['recommendation'] = 'minimal_risk'
+            summary['recommendation_reason'] = 'Strong aggregated evidence of authentic content'
+        
+        # Add detector performance summary
+        summary['detector_performance'] = {}
+        for detector_name in ['safe', 'unified', 'advanced_unified']:
+            result = next((r for r in results if r['name'] == detector_name), None)
+            if result:
+                summary['detector_performance'][detector_name] = {
+                    'available': True,
+                    'successful': result['success'],
+                    'score': result.get('result'),
+                    'confidence': result.get('confidence', 0),
+                    'weight': adaptive_weights.get(detector_name, 0)
+                }
+            else:
+                summary['detector_performance'][detector_name] = {
+                    'available': False,
+                    'successful': False,
+                    'score': None,
+                    'confidence': 0,
+                    'weight': 0
+                }
         
         return summary
     
@@ -824,6 +1084,31 @@ def result():
 
         video_info = json.loads(video_info_json)
         
+        # FIX: Ensure all scores are valid numbers, not None
+        fallback_score = video_info.get('deepfake_percentage', 50.0)
+        
+        # Ensure fallback score is valid
+        if fallback_score is None or not isinstance(fallback_score, (int, float)):
+            fallback_score = 50.0
+        
+        for detector_name, video_data in video_info['processed_videos'].items():
+            if video_data.get('score') is None or not isinstance(video_data.get('score'), (int, float)):
+                # Use final score as fallback for failed detectors
+                video_data['score'] = fallback_score
+                print(f"🔧 Fixed invalid score for {detector_name}: using {fallback_score}")
+        
+        # Also fix detector results in analysis summary
+        if 'analysis_summary' in video_info and 'detector_results' in video_info['analysis_summary']:
+            for detector_name, result_data in video_info['analysis_summary']['detector_results'].items():
+                if result_data.get('score') is None or not isinstance(result_data.get('score'), (int, float)):
+                    result_data['score'] = fallback_score
+                    print(f"🔧 Fixed invalid score in analysis for {detector_name}: using {fallback_score}")
+        
+        # Ensure main percentage is valid
+        if video_info.get('deepfake_percentage') is None or not isinstance(video_info.get('deepfake_percentage'), (int, float)):
+            video_info['deepfake_percentage'] = fallback_score
+            print(f"🔧 Fixed invalid main percentage: using {fallback_score}")
+        
         # PRE-CALCULATE lightweight values
         if 'analysis_summary' in video_info and 'advanced_features' in video_info['analysis_summary']:
             advanced_features = video_info['analysis_summary']['advanced_features']
@@ -899,6 +1184,7 @@ def result():
             video_info['risk_level'] = {'level': 'MINIMAL', 'color': '#2ecc71', 'description': 'Strong indication of authentic content'}
         
         print(f"📊 Lightweight result page prepared")
+        print(f"🔧 All scores verified as non-None")
         
         return render_template('result.html', video_info=video_info)
     

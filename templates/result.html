@@ -719,6 +719,141 @@
             color: var(--dangerous-color);
         }
 
+        /* Aggregation Methodology Styles */
+        .aggregation-methodology {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .aggregation-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .aggregation-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .aggregation-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .aggregation-label {
+            font-size: 11px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .aggregation-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .consensus-high { color: var(--success-color) !important; }
+        .consensus-medium { color: var(--warning-color) !important; }
+        .consensus-single { color: var(--suspicious-color) !important; }
+        .consensus-failed { color: var(--danger-color) !important; }
+
+        .detector-weights {
+            margin-bottom: 16px;
+        }
+
+        .weights-subtitle {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: var(--white);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .weight-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .weight-item.missing {
+            opacity: 0.6;
+            background: var(--gray-100);
+        }
+
+        .weight-detector {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .weight-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .weight-score {
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--gray-900);
+        }
+
+        .weight-contribution {
+            font-size: 10px;
+            color: var(--gray-600);
+            text-align: right;
+        }
+
+        .contribution-value {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .aggregation-note {
+            font-size: 11px;
+            color: var(--gray-600);
+            padding: 12px;
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .aggregation-note i {
+            color: var(--primary-color);
+            margin-top: 2px;
+        }
+
         /* UNIFIED FOOTER */
         .footer {
             background: var(--gray-900);
@@ -862,6 +997,28 @@
             .risk-level-indicator span {
                 font-size: 10px;
                 padding: 3px 5px;
+            }
+
+            .aggregation-summary {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .aggregation-methodology {
+                padding: 16px;
+                margin-top: 16px;
+            }
+
+            .weight-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .weight-details {
+                align-items: flex-start;
+                width: 100%;
             }
         }
 
@@ -1075,7 +1232,7 @@
                                     Your browser does not support the video tag.
                                 </video>
                                 <div class="video-overlay">
-                                    🔄 Unified: {{ "%.1f"|format(video_info.processed_videos.unified.score) }}%
+                                    🔄 Unified: {{ safe_percentage(video_info.processed_videos.unified.score) }}
                                 </div>
                             {% else %}
                                 <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--white);">
@@ -1101,7 +1258,7 @@
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-percentage info-icon"></i>
-                                <span>{{ "%.1f"|format(video_info.processed_videos.unified.score) }}% Deepfake</span>
+                                <span>{{ safe_percentage(video_info.processed_videos.unified.score) }} Deepfake</span>
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-hdd info-icon"></i>
@@ -1206,7 +1363,7 @@
                             </div>
                             
                             <div class="risk-percentage risk-{{ risk_class }}">
-                                {{ risk_icon }} {{ "%.1f"|format(percentage) }}%
+                                {{ risk_icon }} {{ safe_percentage(percentage) }}
                             </div>
                             
                             <div class="risk-label risk-{{ risk_class }}">
@@ -1230,6 +1387,89 @@
                             <span class="risky">60-79% Risky</span>
                             <span class="dangerous">80-100% Dangerous</span>
                         </div>
+
+                        <!-- Aggregation Methodology Section -->
+                        {% if video_info.analysis_summary.aggregation_details %}
+                        <div class="aggregation-methodology">
+                            <h4 class="aggregation-title">
+                                <i class="fas fa-calculator"></i>
+                                Score Calculation Methodology
+                            </h4>
+                            
+                            <div class="aggregation-summary">
+                                <div class="aggregation-info">
+                                    <span class="aggregation-label">Method:</span>
+                                    <span class="aggregation-value">Enhanced Weighted Aggregation</span>
+                                </div>
+                                <div class="aggregation-info">
+                                    <span class="aggregation-label">Active Detectors:</span>
+                                    <span class="aggregation-value">{{ video_info.analysis_summary.aggregation_details.successful_detectors }}/{{ video_info.analysis_summary.aggregation_details.total_detectors }}</span>
+                                </div>
+                                <div class="aggregation-info">
+                                    <span class="aggregation-label">Consensus Level:</span>
+                                    <span class="aggregation-value consensus-{{ video_info.analysis_summary.consensus_level }}">{{ video_info.analysis_summary.consensus_level.title() }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Detector Weights & Contributions -->
+                            <div class="detector-weights">
+                                <h5 class="weights-subtitle">Detector Weights & Contributions</h5>
+                                
+                                {% for detector_name, detector_info in video_info.analysis_summary.detector_results.items() %}
+                                    {% if detector_info.success and detector_info.score is not none %}
+                                    <div class="weight-item">
+                                        <div class="weight-detector">
+                                            {% if detector_name == 'safe' %}🛡️ Safe
+                                            {% elif detector_name == 'unified' %}🔄 Unified
+                                            {% elif detector_name == 'advanced_unified' %}🧠 Advanced
+                                            {% else %}{{ detector_name.title() }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="weight-details">
+                                            <div class="weight-score">{{ safe_percentage(detector_info.score) }}</div>
+                                            <div class="weight-contribution">
+                                                Weight: {{ "%.1f"|format(detector_info.weight_used * 100) }}%
+                                                <span class="contribution-value">
+                                                    ({{ "%.1f"|format(detector_info.contribution_to_final) }} pts)
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <!-- Missing Detector Handling -->
+                                {% for detector_name, detector_info in video_info.analysis_summary.detector_results.items() %}
+                                    {% if not detector_info.success or detector_info.score is none %}
+                                    <div class="weight-item missing">
+                                        <div class="weight-detector">
+                                            {% if detector_name == 'safe' %}🛡️ Safe
+                                            {% elif detector_name == 'unified' %}🔄 Unified
+                                            {% elif detector_name == 'advanced_unified' %}🧠 Advanced
+                                            {% else %}{{ detector_name.title() }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="weight-details">
+                                            <div class="weight-score">--</div>
+                                            <div class="weight-contribution">
+                                                Weight: 0.0%
+                                                <span class="contribution-value">(Excluded)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="aggregation-note">
+                                <i class="fas fa-info-circle"></i>
+                                Final score calculated using adaptive weights based on detector performance, confidence, and execution speed.
+                                {% if video_info.analysis_summary.aggregation_details.successful_detectors < video_info.analysis_summary.aggregation_details.total_detectors %}
+                                Weights dynamically adjusted for {{ video_info.analysis_summary.aggregation_details.successful_detectors }} active detector(s).
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Detection Summary -->
@@ -1248,10 +1488,10 @@
                                 </div>
                                 
                                 {% if unified_result.success and unified_result.score is not none %}
-                                    <div class="detector-score">{{ "%.1f"|format(unified_result.score) }}%</div>
+                                    <div class="detector-score">{{ safe_percentage(unified_result.score) }}</div>
                                     <div class="detector-status status-success">✓ Active</div>
                                 {% else %}
-                                    <div class="detector-score">{{ "%.1f"|format(video_info.deepfake_percentage) }}%</div>
+                                    <div class="detector-score">{{ safe_percentage(video_info.deepfake_percentage) }}</div>
                                     <div class="detector-status status-success">🛡️ Safe</div>
                                 {% endif %}
                             </div>
@@ -1262,7 +1502,7 @@
                                 <div class="detector-name">🛡️ Safe</div>
                                 
                                 {% if safe_result.success and safe_result.score is not none %}
-                                    <div class="detector-score">{{ "%.1f"|format(safe_result.score) }}%</div>
+                                    <div class="detector-score">{{ safe_percentage(safe_result.score) }}</div>
                                     <div class="detector-status status-success">✓ Backup</div>
                                 {% else %}
                                     <div class="detector-score">--</div>
@@ -1270,12 +1510,18 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Advanced Detector (Skipped) -->
+                            <!-- Advanced Detector -->
                             {% set advanced_result = video_info.analysis_summary.detector_results.advanced_unified %}
-                            <div class="detector-item error" style="opacity: 0.6;">
+                            <div class="detector-item {% if advanced_result.success %}success{% else %}error{% endif %}">
                                 <div class="detector-name">🧠 Advanced</div>
-                                <div class="detector-score">--</div>
-                                <div class="detector-status status-error">Skipped</div>
+                                
+                                {% if advanced_result.success and advanced_result.score is not none %}
+                                    <div class="detector-score">{{ safe_percentage(advanced_result.score) }}</div>
+                                    <div class="detector-status status-success">✓ Active</div>
+                                {% else %}
+                                    <div class="detector-score">--</div>
+                                    <div class="detector-status status-error">Error</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -1322,7 +1568,7 @@
                         <div class="gallery-header">
                             <div class="gallery-detector-name">🔄 Unified Detector</div>
                             <div class="gallery-score risk-{{ risk_class }}">
-                                {{ "%.1f"|format(video_info.processed_videos.unified.score) }}%
+                                {{ safe_percentage(video_info.processed_videos.unified.score) }}
                             </div>
                         </div>
                         
@@ -1350,7 +1596,7 @@
                         <div class="gallery-header">
                             <div class="gallery-detector-name">🛡️ Safe Detector</div>
                             <div class="gallery-score risk-{{ risk_class }}">
-                                {{ "%.1f"|format(video_info.processed_videos.safe.score) }}%
+                                {{ safe_percentage(video_info.processed_videos.safe.score) }}
                             </div>
                         </div>
                         
@@ -1370,23 +1616,38 @@
                         </div>
                     </div>
 
-                    <!-- Advanced Detector (Skipped) -->
-                    <div class="gallery-item animate-in" style="opacity: 0.6;">
+                    <!-- Advanced Detector -->
+                    <div class="gallery-item animate-in">
                         <div class="gallery-header">
                             <div class="gallery-detector-name">🧠 Advanced Detector</div>
-                            <div class="gallery-score" style="color: var(--gray-400);">Skipped</div>
-                        </div>
-                        
-                        <div class="gallery-video" style="display: flex; align-items: center; justify-content: center; color: var(--gray-400); background: var(--gray-100);">
-                            <div style="text-align: center;">
-                                <i class="fas fa-forward" style="font-size: 32px; margin-bottom: 8px;"></i>
-                                <div style="font-size: 12px;">Skipped in Ultra-Lightweight Mode</div>
+                            <div class="gallery-score {{ 'success' if video_info.processed_videos.advanced_unified.success else 'error' }}">
+                                {% if video_info.processed_videos.advanced_unified.success %}
+                                    {{ safe_percentage(video_info.processed_videos.advanced_unified.score) }}%
+                                {% else %}
+                                    Error
+                                {% endif %}
                             </div>
                         </div>
                         
+                        {% if video_info.processed_videos.advanced_unified.success %}
+                        <div class="gallery-video">
+                            <video controls muted>
+                                <source src="{{ video_info.processed_videos.advanced_unified.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        {% else %}
+                        <div class="gallery-video" style="display: flex; align-items: center; justify-content: center; color: var(--gray-400); background: var(--gray-100);">
+                            <div style="text-align: center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 8px;"></i>
+                                <div style="font-size: 12px;">Processing Error</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
                         <div class="gallery-info">
-                            <span>--</span>
-                            <span>⚡ Skipped for Speed</span>
+                            <span>{{ video_info.processed_videos.advanced_unified.file_size or 'N/A' }}</span>
+                            <span>{% if video_info.processed_videos.advanced_unified.success %}✓ Advanced Analysis{% else %}⚠️ Error{% endif %}</span>
                         </div>
                     </div>
                 </div>
@@ -1418,20 +1679,8 @@
             <p class="footer-text"><strong>Created by Arijit Mondal</strong></p>
             
             <div class="footer-social">
-                <a href="https://github.com/ariktheone/" class="social-link" target="_blank" rel="noopener noreferrer" title="GitHub">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/arijitmondal30/" class="social-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-                <a href="https://x.com/ArijitM63768876" class="social-link" target="_blank" rel="noopener noreferrer" title="Twitter / X">
-                    <i class="fab fa-twitter"></i>
-                </a>
                 <a href="mailto:arijitmondal200430@gmail.com" class="social-link" title="Email">
                     <i class="fas fa-envelope"></i>
-                </a>
-                <a href="https://arijitmondal-portfolio.vercel.app/" class="social-link" target="_blank" rel="noopener noreferrer" title="Website">
-                    <i class="fas fa-globe"></i>
                 </a>
             </div>
             
@@ -1567,7 +1816,7 @@
             console.log('───────────────────────────────────────────────────');
             console.log('🔄 Unified Detector (PRIMARY):', '{{ video_info.processed_videos.unified.success and "✅ Active" or "🛡️ Safe Fallback" }}');
             console.log('🛡️ Safe Detector (BACKUP):', '{{ video_info.processed_videos.safe.success and "✅ Active" or "❌ Error" }}');
-            console.log('🧠 Advanced Detector:', '⚡ Skipped (Ultra-Lightweight Mode)');
+            console.log('🧠 Advanced Detector:', '{% if video_info.processed_videos.advanced_unified.success %}✅ {{ safe_percentage(video_info.processed_videos.advanced_unified.score) }}%{% else %}❌ Error{% endif %}');
             console.log('───────────────────────────────────────────────────');
             console.log('⚡ Processing Mode: Ultra-Lightweight with Unified Primary');
             console.log('📏 Risk Thresholds:');
